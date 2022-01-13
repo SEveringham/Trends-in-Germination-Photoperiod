@@ -1,0 +1,199 @@
+---
+title: "Analysis of flowering photoperiod and predictor variables"
+output: html_document
+---
+
+Main Analyses for Jagdish et al. (In Review) - Shining a light on patterns of photoperiod sensitivty in seed germination across latitudes, ecosystems and functional traits
+
+- see Rmarkdown "" for gaining a photoperiod sensitivity index for each species using bayesian GLMs
+- see Rmarkdown file "" for Phylogenetic Analyses of photoperiod sensitivity across our species
+- see Rmarkdown file "" for main analysis of germination photoperiod sensitivity and it's relationship with all environmental/ecological predictor variables
+
+This code analyses the categorical response variable photoperiod sensitivity - (long day, short day or non-sensitive to photoperiod) logistically regressed against against environmental predictor variables - latitude, Leaf area index, habitat and the ecological variable - seed mass
+
+Step 1: Install all relevant libraries
+```{r}
+library(lme4)
+library(ggplot2)
+library(tidyverse)
+library(dplyr)
+library(rcompanion)
+library(emmeans)
+library(rstatix)
+library(ggpubr)
+library(Hmisc)
+```
+
+
+Step 2: read in data
+
+```{r}
+globalfloweringphotoperiod <- read.csv("photoperiod_global_addition.csv")
+
+#add a column for general photoperiod sensitivity irrespective of whether the species is short day or long day
+
+globalfloweringphotoperiod <- globalfloweringphotoperiod %>%
+  mutate(OverallPS = case_when(photoperiodism == 'na' ~ '0',
+                               photoperiodism == 'ld' ~ '1',
+                               photoperiodism == 'sd' ~ '1',
+                               photoperiodism == 'sld' ~ '1',
+                               photoperiodism == 'yes' ~ '1'))
+
+globalfloweringphotoperiod$OverallPS <- as.numeric(globalfloweringphotoperiod$OverallPS)
+```
+
+
+Step 3: Running the models
+
+PART 1:
+
+#FLOWERING PHOTOPERIOD SENSITIVITY AND LATITUDE
+
+A) I) The 'Original' model (prior to classifying species as long-day sensitive, short-day sensitive, or neither: 
+```{r}
+latitudemodel <- glm(OverallPS ~ lat, family = "binomial", data = globalfloweringphotoperiod)
+
+summary(latitudemodel)
+plot(latitudemodel)
+```
+
+A. II) Model comparing latitude and LD/SD:
+```{r}
+latitudemodelLDSD <- glm(OverallPS~photoperiodism + lat + photoperiodism * lat, family = gaussian(link = "identity"), data =globalfloweringphotoperiod)
+
+summary(latitudemodelLDSD)
+plot(latitudemodelLDSD)
+```
+
+B) I) Plot of 'Original':
+```{r}
+latitudeplot <- ggplot(aes(x=lat, y=as.factor(OverallPS)), data=globalfloweringphotoperiod) +
+  geom_violin(fill = "skyblue", color="skyblue", size = 0.5) + 
+  stat_summary(fun.data='mean_sd', color='black') +
+  theme_classic() + 
+  labs(x = "Latitude (°S)", y = "Photoperiod Sensitivity Index") + 
+  theme(axis.text=element_text(size=16),
+        axis.title=element_text(size=20))
+
+plot(latitudeplot)
+
+ggsave(latitudeplot, 
+       filename = "latitudeplot.jpg",
+       width = 7,
+       height = 7,
+       dpi=600)
+```
+
+#Nagelkerke Pseudo R^2 values for the 'Original' model 
+```{r}
+nagelkerke(latitudemodel)
+```
+
+#Nagelkerke Pseudo R^2 values for the LD/SD model:
+```{r}
+nagelkerke(latitudemodelLDSD)
+```
+
+PART 2:
+
+#PHOTOPERIOD SENSITIVITY IN FLOWERING TIME AND SEED MASS
+
+A) I) The 'Original' seed mass model:
+```{r}
+seedmassmodel <- glm(OverallPS ~ log10(seed_mass), family = "binomial", data = globalfloweringphotoperiod)
+
+summary(seedmassmodel)
+plot(seedmassmodel)
+```
+
+A) II) The 'Original' seed mass model log10 transformed x-axis:
+```{r}
+seedmassplot <- ggplot(aes(x=(seed_mass), y=(as.factor(OverallPS))), data=globalfloweringphotoperiod) +
+  geom_violin(color = "skyblue", fill = "skyblue", size =4) + 
+  stat_summary(fun.data='mean_sd', color='black') +
+  theme_classic() + scale_x_continuous(trans='log10') + 
+  xlab(expression(Seed~Mass~(mg)~(Log["10"]~Scale))) + 
+  labs(y = "Photoperiod Sensitivity Index") + theme(
+  axis.text=element_text(size=16),
+        axis.title=element_text(size=20))
+
+plot(seedmassplot)
+
+ggsave(seedmassplot, 
+       filename = "seedmassplot.jpg",
+       width = 7,
+       height = 7,
+       dpi=600)
+```
+
+B. I) Seed Mass and LD/SD:
+```{r}
+seedmassmodelLDSD <- glm(OverallPS~photoperiodism + seed_mass + photoperiodism * seed_mass, family = gaussian(link = "identity"), data =globalfloweringphotoperiod)
+
+summary(seedmassmodelLDSD)
+plot(seedmassmodelLDSD)
+```
+
+#Nagelkerke Pseudo-R^2 value for 'Original':
+```{r}
+nagelkerke(seedmassmodel)
+```
+
+#Nagelkerke Pseudo-R^2 value for Seed Mass and LD/SD:
+
+```{r}
+nagelkerke (seedmassmodelLDSD)
+```
+
+PART 3:
+
+#FLOWERING PHOTOPERIOD SENSITIVITY AND LEAF AREA INDEX
+
+A) The original LAI model 
+```{r}
+LAImodel <- glm(OverallPS ~ LAI, family = "binomial", data = globalfloweringphotoperiod)
+summary(LAImodel)
+plot(LAImodel)
+```
+
+B. LAI and LD/SD: 
+
+```{r}
+LAILDSD <- glm(OverallPS~photoperiodism + LAI + photoperiodism * LAI, family = gaussian(link = "identity"), data =globalfloweringphotoperiod)
+
+summary(LAILDSD)
+```
+Nagelkerke Pseudo-R^2 value for 'Original':
+```{r}
+nagelkerke(LAImodel)
+```
+Nagelkerke Pseudo-R^2 value for LAI and LD/SD:
+
+```{r}
+nagelkerke (LAILDSD)
+```
+
+C. Plot LAI vs photoperiod
+
+```{r}
+LAIfloweringphoto <- ggplot(aes(x=(LAI), y=(as.factor(OverallPS))), data=globalfloweringphotoperiod) +
+  geom_violin(color = "skyblue", fill = "skyblue", size =4) + 
+  stat_summary(fun.data='mean_sd', color='black') +
+  theme_classic() + 
+  labs(y = "Photoperiod Sensitivity Index", x = "LAI") + 
+  theme(axis.text=element_text(size=16),
+        axis.title=element_text(size=20))
+
+plot(LAIfloweringphoto)
+
+ggsave(LAIfloweringphoto, 
+       filename = "LAIfloweringphoto.jpg",
+       width = 7,
+       height = 7,
+       dpi=600)
+```
+
+
+PART 4:
+
+#FLOWERING PHOTOPERIOD AND ALPINE ENVIRONMENT 
