@@ -1,0 +1,318 @@
+---
+title: "Main Analysis"
+author: "Ashika Jagdish"
+date: "29/08/2020"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+Main Analyses for Jagdish et al. (In Review) - Shining a light on patterns of photoperiod sensitivty in seed germination across latitudes, ecosystems and functional traits
+
+- see Rmarkdown "" for gaining a photoperiod sensitivity index for each species using bayesian GLMs
+- see Rmarkdown file "" for Phylogenetic Analyses of photoperiod sensitivity across our species
+
+This code is a multiple part series, each hypothesis (photoperiod related to each variable) is one part
+
+
+Step 1: Read in data 
+
+```{r}
+LessThan5 <- read.csv("LessThan5.csv") #LessThan5.csv - Species which had <5% germination in all treatments or <5 seeds germinated across all 3 treatments were removed from further analyses
+```
+
+```{r}
+LessThan5LDSD <- read.csv("LessThan5LDSD.csv") # LessThan5LDSD.csv - Species which had <5% germination in all treatments or <5 seeds germinated across all 3 treatments were removed from further analyses, where species were weighted as being short-day sensitive, long-day sensitive, based off raw germination results. Species which were neither long-day sensitive, nor short-day sensitive, were half-weighted as short-day, and half-weighted as long-day.
+```
+
+Step 2: Call all relevant libraries
+```{r}
+library(lme4)
+library(ggplot2)
+library(tidyverse)
+library(dplyr)
+library(rcompanion)
+library(emmeans)
+library(rstatix)
+library(ggpubr)
+library(Hmisc)
+```
+
+Step 3: Distribution of the data
+Our data is gamma distributed, log transforming the data does not make it look better visually
+```{r}
+hist(LessThan5$PP.Sensitivity)
+```
+
+```{r}
+hist(LessThan5LDSD$PP.Sensitivity.Sign)
+```
+
+Step 4: Running the models
+
+PART 1:
+
+#PHOTOPERIOD SENSITIVITY AND LATITUDE
+
+A) I) The 'Original' model (prior to classifying species as long-day sensitive, short-day sensitive, or neither (contributes half to both): 
+```{r}
+latitudemodel <- glm(PP.Sensitivity~Latitude, family = Gamma(link = "identity"), data =LessThan5, weights = 1/(SE^2))
+
+summary(latitudemodel)
+plot(latitudemodel)
+```
+
+A. II) Model comparing latitude and LD/SD:
+```{r}
+latitudemodelLDSD <- glm(PP.Sensitivity~PP.Sensitivity.Sign + Latitude + PP.Sensitivity.Sign * Latitude, family = gaussian(link = "identity"), data =LessThan5LDSD, weights = Weight)
+
+summary(latitudemodelLDSD)
+plot(latitudemodelLDSD)
+```
+
+B) I) Plot of 'Original':
+```{r}
+latitudeplot <- ggplot(aes(x=Latitude, y=(PP.Sensitivity)), data=LessThan5) +
+  geom_point(color = "lightsalmon2", size = 4, alpha = 0.8) + theme_classic() + labs(x = "Latitude (°S)", y = "Photoperiod Sensitivity Index") + theme(
+  axis.text=element_text(size=16),
+        axis.title=element_text(size=20))
+
+plot(latitudeplot)
+
+ggsave(latitudeplot, 
+       filename = "latitudeplot.jpg",
+       width = 7,
+       height = 7,
+       dpi=600)
+```
+
+#Nagelkerke Pseudo R^2 values for the 'Original' model 
+```{r}
+nagelkerke(latitudemodel)
+```
+
+#Nagelkerke Pseudo R^2 values for the LD/SD model:
+```{r}
+nagelkerke(latitudemodelLDSD)
+```
+
+
+PART 2:
+
+#PHOTOPERIOD SENSITIVITY AND SEED MASS
+
+A) I) The 'Original' seed mass model:
+```{r}
+seedmassmodel <- glm(PP.Sensitivity~Seed.Mass.Mg, family = Gamma(link = "identity"), start = c(0.5, 0.5), data = LessThan5, weights = 1/(SE^2))
+
+summary(seedmassmodel)
+plot(seedmassmodel)
+```
+
+A) II) The 'Original' seed mass model log10 transformed x-axis:
+```{r}
+seedmassplot <- ggplot(aes(x=(Seed.Mass.Mg), y=(PP.Sensitivity)), data=LessThan5) +
+  geom_point(color = "lightsalmon2", size =4, alpha = 0.8) + theme_classic() + scale_x_continuous(trans='log10') + xlab(expression(Seed~Mass~(mg)~(Log["10"]~Scale))) + labs(y = "Photoperiod Sensitivity Index") + theme(
+  axis.text=element_text(size=16),
+        axis.title=element_text(size=20))
+
+plot(seedmassplot)
+
+ggsave(seedmassplot, 
+       filename = "seedmassplot.jpg",
+       width = 7,
+       height = 7,
+       dpi=600)
+```
+
+B. I) Seed Mass and LD/SD:
+```{r}
+seedmassmodelLDSD <- glm(PP.Sensitivity~PP.Sensitivity.Sign + Seed.Mass.Mg + PP.Sensitivity.Sign * Seed.Mass.Mg, family = gaussian(link = "identity"), data =LessThan5LDSD, weights = Weight)
+
+summary(seedmassmodelLDSD)
+plot(seedmassmodelLDSD)
+```
+
+#Nagelkerke Pseudo-R^2 value for 'Original':
+```{r}
+seedmassmodel_null <- glm(PP.Sensitivity~1, family = Gamma(link = "identity"), data = LessThan5, weights = 1/(SE^2))
+
+summary(seedmassmodel_null)
+plot(seedmassmodel_null)
+
+nagelkerke (seedmassmodel, seedmassmodel_null)
+```
+
+#Nagelkerke Pseudo-R^2 value for Seed Mass and LD/SD:
+```{r}
+nagelkerke (seedmassmodelLDSD)
+```
+
+PART 3:
+
+#PHOTOPERIOD SENSITIVITY AND LEAF AREA INDEX (LAI)
+
+A) I) The 'Original' model: 
+```{r}
+LAImodel <- glm(PP.Sensitivity~LAI, family = Gamma(link = "identity"), start = c(0.5, 0.5), data =LessThan5, weights = 1/(SE^2))
+
+summary(LAImodel)
+plot(LAImodel)
+```
+
+A. II) 'Original' Plot
+```{r}
+LAIplot <- ggplot(aes(x=LAI, y=PP.Sensitivity), data=LessThan5) +
+  geom_point(color = "lightsalmon2", size=4, alpha = 0.8) + theme_classic() +  xlab(expression(Leaf~Area~Index~(m^{"2"}~m^-2))) +  labs(y = "Photoperiod Sensitivity Index") + theme(
+  axis.text=element_text(size=16),
+        axis.title=element_text(size=20))
+
+plot(LAIplot)
+
+ggsave(LAIplot, 
+       filename = "LAIplot.jpg",
+       width = 7,
+       height = 7,
+       dpi=600)
+```
+
+B) I) LAI AND LD/SD:
+```{r}
+laimodelLDSD <- glm(PP.Sensitivity~PP.Sensitivity.Sign + LAI + PP.Sensitivity.Sign * LAI, family = gaussian(link = "identity"), data =LessThan5LDSD, weights = Weight)
+
+summary(laimodelLDSD)
+plot(laimodelLDSD)
+```
+
+#Nagelkerke Pseudo R^2 for LAI 'Original':
+```{r}
+LAImodel_null <- glm(PP.Sensitivity~1, family = Gamma(link = "identity"), data =LessThan5, weights = 1/(SE^2))
+
+summary(LAImodel_null)
+plot(LAImodel_null)
+
+nagelkerke (LAImodel, LAImodel_null)
+```
+
+#Nagelkerke for LAI LD/SD:
+```{r}
+nagelkerke (laimodelLDSD)
+```
+
+PART 4:
+
+#PHOTOPERIOD SENSITIVITY AND ALPINE VS. NON-ALPINE HABITATS
+
+A) I) The 'Original' model: 
+```{r}
+alpmodel <- glm(PP.Sensitivity~Alpine.Habitat, family = Gamma(link = "identity"), data =LessThan5, weights = 1/(SE^2))
+
+summary(alpmodel)
+plot(alpmodel)
+```
+
+A) II) The 'Original' Plot:
+```{r}
+alpplot <- LessThan5 %>% ggplot(aes(x=Alpine.Habitat, y=PP.Sensitivity)) + 
+  geom_violin(width=0.5,lwd=0.5, fill="skyblue", alpha = 0.8) + stat_summary(fun.data='mean_sd', color='black') + theme_classic() + labs(x = "Ecosystem Type", y = "Photoperiod Sensitivity Index") + theme(
+  axis.text=element_text(size=16),
+        axis.title=element_text(size=20))
+
+plot(alpplot)
+
+ggsave(alpplot,
+       filename = "alpplot.jpg",
+       width=7,
+       height=7,
+       dpi=600)
+```
+
+B) I) The LD/SD model: 
+```{r}
+alpmodelLDSD <- glm(PP.Sensitivity~PP.Sensitivity.Sign + Alpine.Habitat + PP.Sensitivity.Sign * Alpine.Habitat, family = gaussian(link = "identity"), data =LessThan5LDSD, weights = Weight)
+
+summary(alpmodelLDSD)
+plot(alpmodelLDSD)
+```
+
+
+#Nagelkerke Pseudo R^2 Value for 'Original' model:
+```{r}
+nagelkerke(alpmodel)
+```
+
+#Nagelkerke Pseudo R^2 Value for LD/SD model:
+```{r}
+nagelkerke(alpmodelLDSD)
+```
+
+PART 5:
+
+#PHOTOPERIOD SENSITIVITY AND GROWTH FORM
+
+
+```{r}
+LessThan5GF <- read.csv("LessThan5GF.csv") #Reading in .csv file with species growth-form which excludes the climbers species (n=2)
+hist(LessThan5GF$PP.Sensitivity) #visualisation plot
+```
+
+```{r}
+LessThan5GFLDSD <- read.csv("LessThan5GFLDSD.csv") #LessThan5GFLDSD.csv is where species have been categorised as long-day sensitive, short-day sensitive etc.
+hist(LessThan5GFLDSD$PP.Sensitivity.Sign) #visualisation plot
+```
+
+A) I) The 'Original' model:
+#Setting Growth Form as a factor:
+```{r}
+str(LessThan5GF$Growth.Form)
+LessThan5GF$Growth.Form <- as.factor(LessThan5GF$Growth.Form)
+```
+
+```{r}
+gfmodel <- glm(PP.Sensitivity~Growth.Form, family = Gamma(link = "identity"), data =LessThan5GF, weights = 1/(SE^2))
+
+summary(gfmodel) #gives between group results
+drop1(gfmodel, test = "F") #result of growth form overall
+```
+
+A) II) The 'Original' Plot:
+```{r}
+GFplot <- LessThan5GF %>% ggplot(aes(x=Growth.Form, y=PP.Sensitivity)) + 
+  geom_violin(width=0.5,lwd=0.5, fill="skyblue", alpha=0.8) + stat_summary(fun.data='mean_sd', color='black') + theme_classic() + labs(x = "Growth Form", y = "Photoperiod Sensitivity Index") + theme(
+  axis.text=element_text(size=16),
+        axis.title=element_text(size=20))
+plot(GFplot)
+
+ggsave(GFplot,
+       filename= "GFplot.jpg",
+       width=7,
+       height=7,
+       dpi=600)
+```
+
+B) I) The LD/SD model: 
+#Setting Growth Form as a factor:
+```{r}
+str(LessThan5GFLDSD$Growth.Form)
+LessThan5GFLDSD$Growth.Form <- as.factor(LessThan5GFLDSD$Growth.Form)
+```
+
+```{r}
+gfmodelLDSD <- glm(PP.Sensitivity~PP.Sensitivity.Sign + Growth.Form + PP.Sensitivity.Sign * Growth.Form, family = gaussian(link = "identity"), data =LessThan5GFLDSD, weights = Weight)
+
+summary(gfmodelLDSD)
+plot(gfmodelLDSD)
+``` 
+
+#Nagelkere PseUdo R^2 Value for 'Original':
+```{r}
+nagelkerke(gfmodel)
+```
+
+#Nagelkere PseUdo R^2 Value for LD/SD:
+```{r}
+nagelkerke(gfmodelLDSD)
+```
+
+*END OF SCRIPT*
+
