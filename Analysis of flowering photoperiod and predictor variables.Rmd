@@ -37,9 +37,15 @@ globalfloweringphotoperiod <- globalfloweringphotoperiod %>%
                                photoperiodism == 'ld' ~ '1',
                                photoperiodism == 'sd' ~ '1',
                                photoperiodism == 'sld' ~ '1',
-                               photoperiodism == 'yes' ~ '1'))
+                               photoperiodism == 'yes' ~ '1')) %>%
+  mutate(SDLD = case_when(photoperiodism == 'na' ~ 'NA',
+                               photoperiodism == 'ld' ~ '0',
+                               photoperiodism == 'sd' ~ '1',
+                               photoperiodism == 'sld' ~ 'NA',
+                               photoperiodism == 'yes' ~ 'NA'))
 
 globalfloweringphotoperiod$OverallPS <- as.numeric(globalfloweringphotoperiod$OverallPS)
+globalfloweringphotoperiod$SDLD <- as.numeric(globalfloweringphotoperiod$SDLD)
 ```
 
 
@@ -59,7 +65,7 @@ plot(latitudemodel)
 
 A. II) Model comparing latitude and LD/SD:
 ```{r}
-latitudemodelLDSD <- glm(OverallPS~photoperiodism + lat + photoperiodism * lat, family = gaussian(link = "identity"), data =globalfloweringphotoperiod)
+latitudemodelLDSD <- glm(OverallPS~SDLD + lat + SDLD * lat, family = gaussian(link = "identity"), data =globalfloweringphotoperiod)
 
 summary(latitudemodelLDSD)
 plot(latitudemodelLDSD)
@@ -128,7 +134,7 @@ ggsave(seedmassplot,
 
 B. I) Seed Mass and LD/SD:
 ```{r}
-seedmassmodelLDSD <- glm(OverallPS~photoperiodism + seed_mass + photoperiodism * seed_mass, family = gaussian(link = "identity"), data =globalfloweringphotoperiod)
+seedmassmodelLDSD <- glm(OverallPS~SDLD + seed_mass + SDLD * seed_mass, family = gaussian(link = "identity"), data =globalfloweringphotoperiod)
 
 summary(seedmassmodelLDSD)
 plot(seedmassmodelLDSD)
@@ -159,7 +165,7 @@ plot(LAImodel)
 B. LAI and LD/SD: 
 
 ```{r}
-LAILDSD <- glm(OverallPS~photoperiodism + LAI + photoperiodism * LAI, family = gaussian(link = "identity"), data =globalfloweringphotoperiod)
+LAILDSD <- glm(OverallPS~SDLD + LAI + SDLD * LAI, family = gaussian(link = "identity"), data =globalfloweringphotoperiod)
 
 summary(LAILDSD)
 ```
@@ -196,4 +202,50 @@ ggsave(LAIfloweringphoto,
 
 PART 4:
 
-#FLOWERING PHOTOPERIOD AND ALPINE ENVIRONMENT 
+#FLOWERING PHOTOPERIOD AND ALPINE VS NON-ALPINE ENVIRONMENT 
+
+A) The original alpine model 
+```{r}
+ALPINEmodel <- glm(OverallPS ~ alpine, family = "binomial", data = globalfloweringphotoperiod)
+summary(ALPINEmodel)
+plot(ALPINEmodel)
+```
+
+B. Alpine/non-alpine and LD/SD: 
+
+```{r}
+ALPINELDSD <- glm(OverallPS~SDLD + alpine + SDLD * alpine, family = gaussian(link = "identity"), data =globalfloweringphotoperiod)
+
+summary(ALPINELDSD)
+```
+Nagelkerke Pseudo-R^2 value for 'Original':
+```{r}
+nagelkerke(ALPINEmodel)
+```
+Nagelkerke Pseudo-R^2 value for LAI and LD/SD:
+
+```{r}
+nagelkerke (ALPINELDSD)
+```
+
+C. Plot ALPINE vs photoperiod
+
+```{r}
+ALPINEfloweringphoto <- ggplot(aes(x=(alpine), y=(as.factor(OverallPS))), data=globalfloweringphotoperiod) +
+  geom_violin(color = "skyblue", fill = "skyblue", size =4) + 
+  stat_summary(fun.data='mean_sd', color='black') +
+  theme_classic() + 
+  labs(y = "Photoperiod Sensitivity Index", x = "Alpine") + 
+  theme(axis.text=element_text(size=16),
+        axis.title=element_text(size=20))
+
+plot(ALPINEfloweringphoto)
+
+ggsave(ALPINEfloweringphoto, 
+       filename = "ALPINEfloweringphoto.jpg",
+       width = 7,
+       height = 7,
+       dpi=600)
+```
+
+
