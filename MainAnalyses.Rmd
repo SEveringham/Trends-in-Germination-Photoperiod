@@ -9,8 +9,8 @@ output:
 
 Main Analyses for Jagdish et al. (In Review) - Shining a light on patterns of photoperiod sensitivty in seed germination across latitudes, ecosystems and functional traits
 
-- see Rmarkdown "" for gaining a photoperiod sensitivity index for each species using bayesian GLMs
-- see Rmarkdown file "" for Phylogenetic Analyses of photoperiod sensitivity across our species
+- see Rmarkdown "BayesianPhotoperiodMetricOfficial.Rmd" for gaining a photoperiod sensitivity index for each species using bayesian GLMs
+- see Rmarkdown file "PhylogeneticAnalysis.Rmd" for Phylogenetic Analyses of photoperiod sensitivity across our species
 
 This code is a multiple part series, each hypothesis (photoperiod related to each variable) is one part
 

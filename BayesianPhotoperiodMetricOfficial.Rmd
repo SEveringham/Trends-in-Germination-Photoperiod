@@ -1,0 +1,2339 @@
+---
+title: "Bayesian Photoperiod Metric"
+author: "Ashika Jagdish"
+date: "27/08/2020"
+output: html_document
+---
+Bayesian Photoperiod Sensitivity Metric:
+
+In this segment we will code the Bayesian Photoperiod Sensitivity Metric and standard error for each species.
+
+# RawBinaryGermData.csv is used
+# The 'emmeans' function compares p-values between treatment groups
+# Final main analyses only includes 67 angiosperm species (spanning 42 genera and 26 families), due to insufficient germination across other species 
+
+Step 1: Read in raw data
+```{r}
+RawBinaryGermData <- read.csv("RawBinaryGermData.csv")
+```
+
+Step2: Install/open all relevant packages
+```{r}
+library(dplyr)
+library(tidyverse)
+library(mvtnorm)
+library(arm)
+library(emmeans)
+```
+
+Step 3: Running the BayesGLM functions (Function 1, which creates a Bayes Generalised Linear Model) and then running Function 2, which uses this BayesGLM to give us a photoperiod metric.
+
+```{r}
+#FUNCTION 1
+Sensitivitymodel <- function(speciesselected, ...) {
+  bayesglm(No.Germinated~Treatment, family=binomial(), data = subset(RawBinaryGermData, Species==speciesselected), prior.scale=2.5)
+}
+
+#FUNCTION 2
+Sensitivitymetric <- function(model) {
+  sqrt((model$coefficients[2]^2+ model$coefficients[3]^2 + (model$coefficients[3]- model$coefficients[2])^2)/3)
+}
+
+#You need this line for the third section (to calculate sensitivity)
+Sensitivity_Metric_rep_parboot = c()
+```
+
+Step 3: Now that we have run these functions, we are going to run them on each species to get our Sensitivity Metric as well as the standard error. Then you want to print them out so we can add it into our "LessThan5" formerly "UpdatedPPDATA" Sheet (that we will use for our weighted regressions). 
+
+Note to self: The Standard error should equal the standard deviation. SE tells us how accurate the mean of any sample population is to the true population. Higher values of SE decreases overall accuracy. 
+
+Note to self: Increase the boostrap replicates to 1:10000 to give it a more stable value 
+
+Note to self: The default prior value of 2.5 is taken from Gemlman et al. (2008) and is appropriate as it is not overly restrictive (like 1) and is a suitbale weight for large treatment changes. In Bayesian statistics, the data is more logical and structured as we "update our beliefs, i.e. prior" as we get more information. 
+
+Species:
+1. Acacia leptoloba
+```{r}
+#getting sensitivity metric
+Acacialeptolobamodel <- Sensitivitymodel(speciesselected = "Acacia leptoloba") #first run the model
+Acacialeptolobasensitivity <- Sensitivitymetric(model = Acacialeptolobamodel) #then extract the sensitivity metric
+
+#getting sensitivity SE
+for(j in 1:10000){
+  coeff_rep <- rmvnorm(1, mean = Acacialeptolobamodel$coefficients, sigma = vcov(Acacialeptolobamodel))
+  Sensitivity_Metric_rep_parboot[j] <- sqrt(
+    (coeff_rep[2]^2+coeff_rep[3]^2+(coeff_rep[3]-coeff_rep[2])^2)/3)
+}
+AcacialeptolobaSE <- sd(Sensitivity_Metric_rep_parboot)
+
+#printing the values so I can record them for the spreadsheet! :) 
+print(Acacialeptolobasensitivity) #save this number
+print(AcacialeptolobaSE) #save this number
+
+summary(Acacialeptolobamodel)
+```
+
+```{r}
+Acacialeptoloba.emmeans <- emmeans(Acacialeptolobamodel, "Treatment", type = "response")
+pairs(Acacialeptoloba.emmeans)
+```
+
+2. Acacia ulicifolia
+```{r}
+#getting sensitivity metric
+Acaciaulicifoliamodel <- Sensitivitymodel(speciesselected = "Acacia ulicifolia") #first run the model
+Acaciaulicifoliasensitivity <- Sensitivitymetric(model = Acaciaulicifoliamodel) #then extract the sensitivity metric
+
+#getting sensitivity SE
+for(j in 1:10000){
+  coeff_rep <- rmvnorm(1, mean = Acaciaulicifoliamodel$coefficients, sigma = vcov(Acaciaulicifoliamodel))
+  Sensitivity_Metric_rep_parboot[j] <- sqrt(
+    (coeff_rep[2]^2+coeff_rep[3]^2+(coeff_rep[3]-coeff_rep[2])^2)/3)
+}
+AcaciaulicifoliaSE <- sd(Sensitivity_Metric_rep_parboot)
+
+#printing the values so I can record them for the spreadsheet! :) 
+print(Acaciaulicifoliasensitivity) #save this number
+print(AcaciaulicifoliaSE) #save this number
+
+summary(Acaciaulicifoliamodel)
+```
+
+```{r}
+Acaciaulicifolia.emmeans <- emmeans(Acaciaulicifoliamodel, "Treatment")
+pairs(Acaciaulicifolia.emmeans)
+```
+
+3. Acaena Species A
+```{r}
+#getting sensitivity metric
+Acaenaspamodel <- Sensitivitymodel(speciesselected = "Acaena Species A") #first run the model
+Acaenaspasensitivity <- Sensitivitymetric(model = Acaenaspamodel) #then extract the sensitivity metric
+
+#getting sensitivity SE
+for(j in 1:10000){
+  coeff_rep <- rmvnorm(1, mean = Acaenaspamodel$coefficients, sigma = vcov(Acaenaspamodel))
+  Sensitivity_Metric_rep_parboot[j] <- sqrt(
+    (coeff_rep[2]^2+coeff_rep[3]^2+(coeff_rep[3]-coeff_rep[2])^2)/3)
+}
+AcaenaspaSE <- sd(Sensitivity_Metric_rep_parboot)
+
+#printing the values so I can record them for the spreadsheet! :) 
+print(Acaenaspasensitivity) #save this number
+print(AcaenaspaSE) #save this number
+summary(Acaenaspamodel)
+```
+
+```{r}
+Acaenaspamodel.emmeans <- emmeans(Acaenaspamodel, "Treatment")
+pairs(Acaenaspamodel.emmeans)
+```
+
+4. Aciphylla glacialis
+```{r}
+#getting sensitivity metric
+Aciphyllaglacialismodel <- Sensitivitymodel(speciesselected = "Aciphylla glacialis") #first run the model
+Aciphyllaglacialissensitivity <- Sensitivitymetric(model = Aciphyllaglacialismodel) #then extract the sensitivity metric
+
+#getting sensitivity SE
+for(j in 1:10000){
+  coeff_rep <- rmvnorm(1, mean = Aciphyllaglacialismodel$coefficients, sigma = vcov(Aciphyllaglacialismodel))
+  Sensitivity_Metric_rep_parboot[j] <- sqrt(
+    (coeff_rep[2]^2+coeff_rep[3]^2+(coeff_rep[3]-coeff_rep[2])^2)/3)
+}
+AciphyllaglacialisSE <- sd(Sensitivity_Metric_rep_parboot)
+
+#printing the values so I can record them for the spreadsheet! :) 
+print(Aciphyllaglacialissensitivity) #save this number
+print(AciphyllaglacialisSE) #save this number
+
+```
+
+5. Acradenia euodiiformis
+```{r}
+#getting sensitivity metric
+Acradeniaeuodiiformismodel <- Sensitivitymodel(speciesselected = "Acradenia euodiiformis") 
+Acradeniaeuodiiformissensitivity <- Sensitivitymetric(model = Acradeniaeuodiiformismodel) 
+
+#getting sensitivity SE
+for(j in 1:10000){
+  coeff_rep <- rmvnorm(1, mean = Acradeniaeuodiiformismodel$coefficients, sigma = vcov(Acradeniaeuodiiformismodel))
+  Sensitivity_Metric_rep_parboot[j] <- sqrt(
+    (coeff_rep[2]^2+coeff_rep[3]^2+(coeff_rep[3]-coeff_rep[2])^2)/3)
+}
+AcradeniaeuodiiformisSE <- sd(Sensitivity_Metric_rep_parboot)
+
+#printing the values so I can record them for the spreadsheet! :) 
+print(Acradeniaeuodiiformissensitivity) #save this number
+print(AcradeniaeuodiiformisSE) #save this number
+```
+
+6. Acronychia crassipetala
+```{r}
+#getting sensitivity metric
+Acronychiacrassipetalamodel <- Sensitivitymodel(speciesselected = "Acronychia crassipetala") 
+Acronychiacrassipetalasensitivity <- Sensitivitymetric(model = Acronychiacrassipetalamodel) 
+
+#getting sensitivity SE
+for(j in 1:10000){
+  coeff_rep <- rmvnorm(1, mean = Acronychiacrassipetalamodel$coefficients, sigma = vcov(Acronychiacrassipetalamodel))
+  Sensitivity_Metric_rep_parboot[j] <- sqrt(
+    (coeff_rep[2]^2+coeff_rep[3]^2+(coeff_rep[3]-coeff_rep[2])^2)/3)
+}
+AcronychiacrassipetalaSE <- sd(Sensitivity_Metric_rep_parboot)
+
+#printing the values so I can record them for the spreadsheet! :) 
+print(Acronychiacrassipetalasensitivity) #save this number
+print(AcronychiacrassipetalaSE) #save this number
+summary(Acronychiacrassipetalamodel)
+```
+
+```{r}
+Acronychiacrassipetala.emmeans <- emmeans(Acronychiacrassipetalamodel, "Treatment")
+pairs(Acronychiacrassipetala.emmeans)
+```
+
+7. Acronychia oblongifolia
+```{r}
+#getting sensitivity metric
+Acronychiaoblongifoliamodel <- Sensitivitymodel(speciesselected = "Acronychia oblongifolia") 
+Acronychiaoblongifoliasensitivity <- Sensitivitymetric(model = Acronychiaoblongifoliamodel) 
+
+#getting sensitivity SE
+for(j in 1:10000){
+  coeff_rep <- rmvnorm(1, mean = Acronychiaoblongifoliamodel$coefficients, sigma = vcov(Acronychiaoblongifoliamodel))
+  Sensitivity_Metric_rep_parboot[j] <- sqrt(
+    (coeff_rep[2]^2+coeff_rep[3]^2+(coeff_rep[3]-coeff_rep[2])^2)/3)
+}
+AcronychiaoblongifoliaSE <- sd(Sensitivity_Metric_rep_parboot)
+
+#printing the values so I can record them for the spreadsheet! :) 
+print(Acronychiaoblongifoliasensitivity) #save this number
+print(AcronychiaoblongifoliaSE) #save this number
+summary(Acronychiaoblongifoliamodel)
+```
+
+```{r}
+Acronychiaoblongifolia.emmeans <- emmeans(Acronychiaoblongifoliamodel, "Treatment", type = "response")
+pairs(Acronychiaoblongifolia.emmeans)
+```
+
+8. Acrothamnus hookeri
+```{r}
+#getting sensitivity metric
+Acrothamnushookerimodel <- Sensitivitymodel(speciesselected = "Acrothamnus hookeri") 
+Acrothamnushookerisensitivity <- Sensitivitymetric(model = Acrothamnushookerimodel) 
+
+#getting sensitivity SE
+for(j in 1:10000){
+  coeff_rep <- rmvnorm(1, mean = Acrothamnushookerimodel$coefficients, sigma = vcov(Acrothamnushookerimodel))
+  Sensitivity_Metric_rep_parboot[j] <- sqrt(
+    (coeff_rep[2]^2+coeff_rep[3]^2+(coeff_rep[3]-coeff_rep[2])^2)/3)
+}
+AcrothamnushookeriSE <- sd(Sensitivity_Metric_rep_parboot)
+
+#printing the values so I can record them for the spreadsheet! :) 
+print(Acrothamnushookerisensitivity) #save this number
+print(AcrothamnushookeriSE) #save this number
+```
+
+9. Alchornea ilicifolia
+```{r}
+#getting sensitivity metric
+Alchorneailicifoliamodel <- Sensitivitymodel(speciesselected = "Alchornea ilicifolia") 
+Alchorneailicifoliasensitivity <- Sensitivitymetric(model = Alchorneailicifoliamodel) 
+
+#getting sensitivity SE
+for(j in 1:10000){
+  coeff_rep <- rmvnorm(1, mean = Alchorneailicifoliamodel$coefficients, sigma = vcov(Alchorneailicifoliamodel))
+  Sensitivity_Metric_rep_parboot[j] <- sqrt(
+    (coeff_rep[2]^2+coeff_rep[3]^2+(coeff_rep[3]-coeff_rep[2])^2)/3)
+}
+AlchorneailicifoliaSE <- sd(Sensitivity_Metric_rep_parboot)
+
+#printing the values so I can record them for the spreadsheet! :) 
+print(Alchorneailicifoliasensitivity) #save this number
+print(AlchorneailicifoliaSE) #save this number
+```
+
+10. Allocasuarina littoralis
+```{r}
+#getting sensitivity metric
+Allocasuarinalittoralismodel <- Sensitivitymodel(speciesselected = "Allocasuarina littoralis") 
+Allocasuarinalittoralissensitivity <- Sensitivitymetric(model = Allocasuarinalittoralismodel) 
+
+#getting sensitivity SE
+for(j in 1:10000){
+  coeff_rep <- rmvnorm(1, mean = Allocasuarinalittoralismodel$coefficients, sigma = vcov(Allocasuarinalittoralismodel))
+  Sensitivity_Metric_rep_parboot[j] <- sqrt(
+    (coeff_rep[2]^2+coeff_rep[3]^2+(coeff_rep[3]-coeff_rep[2])^2)/3)
+}
+AllocasuarinalittoralisSE <- sd(Sensitivity_Metric_rep_parboot)
+
+#printing the values so I can record them for the spreadsheet! :) 
+print(Allocasuarinalittoralissensitivity) #save this number
+print(AllocasuarinalittoralisSE) #save this number
+summary(Allocasuarinalittoralismodel)
+```
+
+```{r}
+Allocasuarinalittoralis.emmeans <- emmeans(Allocasuarinalittoralismodel, "Treatment", type = "response")
+pairs(Allocasuarinalittoralis.emmeans)
+```
+
+11. Alphitonia petrei
+```{r}
+#getting sensitivity metric
+Alphitoniapetreimodel <- Sensitivitymodel(speciesselected = "Alphitonia petrei") 
+Alphitoniapetreisensitivity <- Sensitivitymetric(model = Alphitoniapetreimodel) 
+
+#getting sensitivity SE
+for(j in 1:10000){
+  coeff_rep <- rmvnorm(1, mean = Alphitoniapetreimodel$coefficients, sigma = vcov(Alphitoniapetreimodel))
+  Sensitivity_Metric_rep_parboot[j] <- sqrt(
+    (coeff_rep[2]^2+coeff_rep[3]^2+(coeff_rep[3]-coeff_rep[2])^2)/3)
+}
+AlphitoniapetreiSE <- sd(Sensitivity_Metric_rep_parboot)
+
+#printing the values so I can record them for the spreadsheet! :) 
+print(Alphitoniapetreisensitivity) #save this number
+print(AlphitoniapetreiSE) #save this number
+```
+
+12. Alpinia arctiflora
+```{r}
+#getting sensitivity metric
+Alpiniaarctifloramodel <- Sensitivitymodel(speciesselected = "Alpinia arctiflora") 
+Alpiniaarctiflorasensitivity <- Sensitivitymetric(model = Alpiniaarctifloramodel) 
+
+#getting sensitivity SE
+for(j in 1:10000){
+  coeff_rep <- rmvnorm(1, mean = Alpiniaarctifloramodel$coefficients, sigma = vcov(Alpiniaarctifloramodel))
+  Sensitivity_Metric_rep_parboot[j] <- sqrt(
+    (coeff_rep[2]^2+coeff_rep[3]^2+(coeff_rep[3]-coeff_rep[2])^2)/3)
+}
+AlpiniaarctifloraSE <- sd(Sensitivity_Metric_rep_parboot)
+
+#printing the values so I can record them for the spreadsheet! :) 
+print(Alpiniaarctiflorasensitivity) #save this number
+print(AlpiniaarctifloraSE) #save this number
+summary(Alpiniaarctifloramodel)
+```
+
+```{r}
+Alpiniaarctiflora.emmeans <- emmeans(Alpiniaarctifloramodel, "Treatment")
+pairs(Alpiniaarctiflora.emmeans)
+```
+
+13. Alpinia caerulea
+```{r}
+#getting sensitivity metric
+Alpiniacaeruleamodel <- Sensitivitymodel(speciesselected = "Alpinia caerulea") 
+Alpiniacaeruleasensitivity <- Sensitivitymetric(model = Alpiniacaeruleamodel) 
+
+#getting sensitivity SE
+for(j in 1:10000){
+  coeff_rep <- rmvnorm(1, mean = Alpiniacaeruleamodel$coefficients, sigma = vcov(Alpiniacaeruleamodel))
+  Sensitivity_Metric_rep_parboot[j] <- sqrt(
+    (coeff_rep[2]^2+coeff_rep[3]^2+(coeff_rep[3]-coeff_rep[2])^2)/3)
+}
+AlpiniacaeruleaSE <- sd(Sensitivity_Metric_rep_parboot)
+
+#printing the values so I can record them for the spreadsheet! :) 
+print(Alpiniacaeruleasensitivity) #save this number
+print(AlpiniacaeruleaSE) #save this number
+summary(Alpiniacaeruleamodel)
+```
+
+```{r}
+Alpiniacaerulea.emmeans <- emmeans(Alpiniacaeruleamodel, "Treatment")
+pairs(Alpiniacaerulea.emmeans)
+```
+
+14. Austrosteenisia blackii
+```{r}
+#getting sensitivity metric
+Austrosteenisiablackiimodel <- Sensitivitymodel(speciesselected = "Austrosteenisia blackii") 
+Austrosteenisiablackiisensitivity <- Sensitivitymetric(model = Austrosteenisiablackiimodel) 
+
+#getting sensitivity SE
+for(j in 1:10000){
+  coeff_rep <- rmvnorm(1, mean = Austrosteenisiablackiimodel$coefficients, sigma = vcov(Austrosteenisiablackiimodel))
+  Sensitivity_Metric_rep_parboot[j] <- sqrt(
+    (coeff_rep[2]^2+coeff_rep[3]^2+(coeff_rep[3]-coeff_rep[2])^2)/3)
+}
+AustrosteenisiablackiiSE <- sd(Sensitivity_Metric_rep_parboot)
+
+#printing the values so I can record them for the spreadsheet! :) 
+print(Austrosteenisiablackiisensitivity) #save this number
+print(AustrosteenisiablackiiSE) #save this number
+summary(Austrosteenisiablackiimodel)
+```
+
+```{r}
+Austrosteenisiablackii.emmeans <- emmeans(Austrosteenisiablackiimodel, "Treatment")
+pairs(Austrosteenisiablackii.emmeans)
+```
+
+15. Banksia aemula
+```{r}
+#getting sensitivity metric
+Banksiaaemulamodel <- Sensitivitymodel(speciesselected = "Banksia aemula") 
+Banksiaaemulasensitivity <- Sensitivitymetric(model = Banksiaaemulamodel) 
+
+#getting sensitivity SE
+for(j in 1:10000){
+  coeff_rep <- rmvnorm(1, mean = Banksiaaemulamodel$coefficients, sigma = vcov(Banksiaaemulamodel))
+  Sensitivity_Metric_rep_parboot[j] <- sqrt(
+    (coeff_rep[2]^2+coeff_rep[3]^2+(coeff_rep[3]-coeff_rep[2])^2)/3)
+}
+BanksiaaemulaSE <- sd(Sensitivity_Metric_rep_parboot)
+
+#printing the values so I can record them for the spreadsheet! :) 
+print(Banksiaaemulasensitivity) #save this number
+print(BanksiaaemulaSE) #save this number
+summary(Banksiaaemulamodel)
+```
+
+```{r}
+Banksiaaemula.emmeans <- emmeans(Banksiaaemulamodel, "Treatment")
+pairs(Banksiaaemula.emmeans)
+```
+
+16. Banksia oblongifolia
+```{r}
+#getting sensitivity metric
+Banksiaoblongifoliamodel <- Sensitivitymodel(speciesselected = "Banksia oblongifolia") 
+Banksiaoblongifoliasensitivity <- Sensitivitymetric(model = Banksiaoblongifoliamodel) 
+
+#getting sensitivity SE
+for(j in 1:10000){
+  coeff_rep <- rmvnorm(1, mean = Banksiaoblongifoliamodel$coefficients, sigma = vcov(Banksiaoblongifoliamodel))
+  Sensitivity_Metric_rep_parboot[j] <- sqrt(
+    (coeff_rep[2]^2+coeff_rep[3]^2+(coeff_rep[3]-coeff_rep[2])^2)/3)
+}
+BanksiaoblongifoliaSE <- sd(Sensitivity_Metric_rep_parboot)
+
+#printing the values so I can record them for the spreadsheet! :) 
+print(Banksiaoblongifoliasensitivity) #save this number
+print(BanksiaoblongifoliaSE) #save this number
+summary(Banksiaoblongifoliamodel)
+```
+
+```{r}
+Banksiaoblongifolia.emmeans <- emmeans(Banksiaoblongifoliamodel, "Treatment")
+pairs(Banksiaoblongifolia.emmeans)
+```
+
+17. Banksia serrata
+```{r}
+#getting sensitivity metric
+Banksiaserratamodel <- Sensitivitymodel(speciesselected = "Banksia serrata") 
+Banksiaserratasensitivity <- Sensitivitymetric(model = Banksiaserratamodel) 
+
+#getting sensitivity SE
+for(j in 1:10000){
+  coeff_rep <- rmvnorm(1, mean = Banksiaserratamodel$coefficients, sigma = vcov(Banksiaserratamodel))
+  Sensitivity_Metric_rep_parboot[j] <- sqrt(
+    (coeff_rep[2]^2+coeff_rep[3]^2+(coeff_rep[3]-coeff_rep[2])^2)/3)
+}
+BanksiaserrataSE <- sd(Sensitivity_Metric_rep_parboot)
+
+#printing the values so I can record them for the spreadsheet! :) 
+print(Banksiaserratasensitivity) #save this number
+print(BanksiaserrataSE) #save this number
+summary(Banksiaserratamodel)
+```
+
+```{r}
+Banksiaserrata.emmeans <- emmeans(Banksiaserratamodel, "Treatment")
+pairs(Banksiaserrata.emmeans)
+```
+
+18.  Breynia cernua
+```{r}
+#getting sensitivity metric
+Breyniacernuamodel <- Sensitivitymodel(speciesselected = "Breynia cernua") 
+Breyniacernuasensitivity <- Sensitivitymetric(model = Breyniacernuamodel) 
+
+#getting sensitivity SE
+for(j in 1:10000){
+  coeff_rep <- rmvnorm(1, mean = Breyniacernuamodel$coefficients, sigma = vcov(Breyniacernuamodel))
+  Sensitivity_Metric_rep_parboot[j] <- sqrt(
+    (coeff_rep[2]^2+coeff_rep[3]^2+(coeff_rep[3]-coeff_rep[2])^2)/3)
+}
+BreyniacernuaSE <- sd(Sensitivity_Metric_rep_parboot)
+
+#printing the values so I can record them for the spreadsheet! :) 
+print(Breyniacernuasensitivity) #save this number
+print(BreyniacernuaSE) #save this number
+summary(Breyniacernuamodel)
+```
+
+```{r}
+Breyniacernua.emmeans <- emmeans(Breyniacernuamodel, "Treatment")
+pairs(Breyniacernua.emmeans)
+```
+
+19. Breynia oblongifolia
+```{r}
+#getting sensitivity metric
+Breyniaoblongifoliamodel <- Sensitivitymodel(speciesselected = "Breynia oblongifolia") 
+Breyniaoblongifoliasensitivity <- Sensitivitymetric(model = Breyniaoblongifoliamodel) 
+
+#getting sensitivity SE
+for(j in 1:10000){
+  coeff_rep <- rmvnorm(1, mean = Breyniaoblongifoliamodel$coefficients, sigma = vcov(Breyniaoblongifoliamodel))
+  Sensitivity_Metric_rep_parboot[j] <- sqrt(
+    (coeff_rep[2]^2+coeff_rep[3]^2+(coeff_rep[3]-coeff_rep[2])^2)/3)
+}
+BreyniaoblongifoliaSE <- sd(Sensitivity_Metric_rep_parboot)
+
+#printing the values so I can record them for the spreadsheet! :) 
+print(Breyniaoblongifoliasensitivity) #save this number
+print(BreyniaoblongifoliaSE) #save this number
+```
+
+20. Bursaria spinosa
+```{r}
+#getting sensitivity metric
+Bursariaspinosamodel <- Sensitivitymodel(speciesselected = "Bursaria spinosa") 
+Bursariaspinosasensitivity <- Sensitivitymetric(model = Bursariaspinosamodel) 
+
+#getting sensitivity SE
+for(j in 1:10000){
+  coeff_rep <- rmvnorm(1, mean = Bursariaspinosamodel$coefficients, sigma = vcov(Bursariaspinosamodel))
+  Sensitivity_Metric_rep_parboot[j] <- sqrt(
+    (coeff_rep[2]^2+coeff_rep[3]^2+(coeff_rep[3]-coeff_rep[2])^2)/3)
+}
+BursariaspinosaSE <- sd(Sensitivity_Metric_rep_parboot)
+
+#printing the values so I can record them for the spreadsheet! :) 
+print(Bursariaspinosasensitivity) #save this number
+print(BursariaspinosaSE) #save this number
+summary(Bursariaspinosamodel)
+```
+
+```{r}
+Bursariaspinosa.emmeans <- emmeans(Bursariaspinosamodel, "Treatment")
+pairs(Bursariaspinosa.emmeans)
+```
+
+21. Callistemon sieberi 
+```{r}
+#getting sensitivity metric
+Callistemonsieberimodel <- Sensitivitymodel(speciesselected = "Callistemon sieberi") 
+Callistemonsieberisensitivity <- Sensitivitymetric(model = Callistemonsieberimodel) 
+
+#getting sensitivity SE
+for(j in 1:10000){
+  coeff_rep <- rmvnorm(1, mean = Callistemonsieberimodel$coefficients, sigma = vcov(Callistemonsieberimodel))
+  Sensitivity_Metric_rep_parboot[j] <- sqrt(
+    (coeff_rep[2]^2+coeff_rep[3]^2+(coeff_rep[3]-coeff_rep[2])^2)/3)
+}
+CallistemonsieberiSE <- sd(Sensitivity_Metric_rep_parboot)
+
+#printing the values so I can record them for the spreadsheet! :) 
+print(Callistemonsieberisensitivity) #save this number
+print(CallistemonsieberiSE) #save this number
+summary(Callistemonsieberimodel) 
+```
+
+```{r}
+Callistemonsieberi.emmeans <- emmeans(Callistemonsieberimodel, "Treatment")
+pairs(Callistemonsieberi.emmeans)
+```
+
+22. Callitris intratropica
+```{r}
+#getting sensitivity metric
+Callitrisintratropicamodel <- Sensitivitymodel(speciesselected = "Callitris intratropica") 
+Callitrisintratropicasensitivity <- Sensitivitymetric(model = Callitrisintratropicamodel) 
+
+#getting sensitivity SE
+for(j in 1:10000){
+  coeff_rep <- rmvnorm(1, mean = Callitrisintratropicamodel$coefficients, sigma = vcov(Callitrisintratropicamodel))
+  Sensitivity_Metric_rep_parboot[j] <- sqrt(
+    (coeff_rep[2]^2+coeff_rep[3]^2+(coeff_rep[3]-coeff_rep[2])^2)/3)
+}
+CallitrisintratropicaSE <- sd(Sensitivity_Metric_rep_parboot)
+
+#printing the values so I can record them for the spreadsheet! :) 
+print(Callitrisintratropicasensitivity) #save this number
+print(CallitrisintratropicaSE) #save this number
+```
+
+23. Carpha nivicola
+```{r}
+#getting sensitivity metric
+Carphanivicolamodel <- Sensitivitymodel(speciesselected = "Carpha nivicola") 
+Carphanivicolasensitivity <- Sensitivitymetric(model = Carphanivicolamodel) 
+
+#getting sensitivity SE
+for(j in 1:10000){
+  coeff_rep <- rmvnorm(1, mean = Carphanivicolamodel$coefficients, sigma = vcov(Carphanivicolamodel))
+  Sensitivity_Metric_rep_parboot[j] <- sqrt(
+    (coeff_rep[2]^2+coeff_rep[3]^2+(coeff_rep[3]-coeff_rep[2])^2)/3)
+}
+CarphanivicolaSE <- sd(Sensitivity_Metric_rep_parboot)
+
+#printing the values so I can record them for the spreadsheet! :) 
+print(Carphanivicolasensitivity) #save this number
+print(CarphanivicolaSE) #save this number
+```
+
+24. Celmisia longifolia
+```{r}
+#getting sensitivity metric
+Celmisialongifoliamodel <- Sensitivitymodel(speciesselected = "Celmisia longifolia") 
+Celmisialongifoliasensitivity <- Sensitivitymetric(model = Celmisialongifoliamodel) 
+
+#getting sensitivity SE
+for(j in 1:10000){
+  coeff_rep <- rmvnorm(1, mean = Celmisialongifoliamodel$coefficients, sigma = vcov(Celmisialongifoliamodel))
+  Sensitivity_Metric_rep_parboot[j] <- sqrt(
+    (coeff_rep[2]^2+coeff_rep[3]^2+(coeff_rep[3]-coeff_rep[2])^2)/3)
+}
+CelmisialongifoliaSE <- sd(Sensitivity_Metric_rep_parboot)
+
+#printing the values so I can record them for the spreadsheet! :) 
+print(Celmisialongifoliasensitivity) #save this number
+print(CelmisialongifoliaSE) #save this number
+summary(Celmisialongifoliamodel)
+```
+
+```{r}
+Celmisialongifolia.emmeans <- emmeans(Celmisialongifoliamodel, "Treatment")
+pairs(Celmisialongifolia.emmeans)
+```
+
+25. Chamaecrista concinna
+```{r}
+#getting sensitivity metric
+Chamaecristaconcinnamodel <- Sensitivitymodel(speciesselected = "Chamaecrista concinna") 
+Chamaecristaconcinnasensitivity <- Sensitivitymetric(model = Chamaecristaconcinnamodel) 
+
+#getting sensitivity SE
+for(j in 1:10000){
+  coeff_rep <- rmvnorm(1, mean = Chamaecristaconcinnamodel$coefficients, sigma = vcov(Chamaecristaconcinnamodel))
+  Sensitivity_Metric_rep_parboot[j] <- sqrt(
+    (coeff_rep[2]^2+coeff_rep[3]^2+(coeff_rep[3]-coeff_rep[2])^2)/3)
+}
+ChamaecristaconcinnaSE <- sd(Sensitivity_Metric_rep_parboot)
+
+#printing the values so I can record them for the spreadsheet! :) 
+print(Chamaecristaconcinnasensitivity) #save this number
+print(ChamaecristaconcinnaSE) #save this number
+summary(Chamaecristaconcinnamodel)
+```
+
+```{r}
+Chamaecristaconcinna.emmeans <- emmeans(Chamaecristaconcinnamodel, "Treatment")
+pairs(Chamaecristaconcinna.emmeans)
+```
+
+26. Chionochloa frigida
+```{r}
+#getting sensitivity metric
+Chionochloafrigidamodel <- Sensitivitymodel(speciesselected = "Chionochloa frigida") 
+Chionochloafrigidasensitivity <- Sensitivitymetric(model = Chionochloafrigidamodel) 
+
+#getting sensitivity SE
+for(j in 1:10000){
+  coeff_rep <- rmvnorm(1, mean = Chionochloafrigidamodel$coefficients, sigma = vcov(Chionochloafrigidamodel))
+  Sensitivity_Metric_rep_parboot[j] <- sqrt(
+    (coeff_rep[2]^2+coeff_rep[3]^2+(coeff_rep[3]-coeff_rep[2])^2)/3)
+}
+ChionochloafrigidaSE <- sd(Sensitivity_Metric_rep_parboot)
+
+#printing the values so I can record them for the spreadsheet! :) 
+print(Chionochloafrigidasensitivity) #save this number
+print(ChionochloafrigidaSE) #save this number
+summary(Chionochloafrigidamodel)
+```
+
+```{r}
+Chionochloafrigida.emmeans <- emmeans(Chionochloafrigidamodel, "Treatment")
+pairs(Chionochloafrigida.emmeans)
+```
+
+27. Cissus antarctica
+```{r}
+#getting sensitivity metric
+Cissusantarcticamodel <- Sensitivitymodel(speciesselected = "Cissus antarctica") 
+Cissusantarcticasensitivity <- Sensitivitymetric(model = Cissusantarcticamodel) 
+
+#getting sensitivity SE
+for(j in 1:10000){
+  coeff_rep <- rmvnorm(1, mean = Cissusantarcticamodel$coefficients, sigma = vcov(Cissusantarcticamodel))
+  Sensitivity_Metric_rep_parboot[j] <- sqrt(
+    (coeff_rep[2]^2+coeff_rep[3]^2+(coeff_rep[3]-coeff_rep[2])^2)/3)
+}
+CissusantarcticaSE <- sd(Sensitivity_Metric_rep_parboot)
+
+#printing the values so I can record them for the spreadsheet! :) 
+print(Cissusantarcticasensitivity) #save this number
+print(CissusantarcticaSE) #save this number
+```
+
+28. Cissus hypoglauca.B
+#This species was collected from Border Ranges National Park
+```{r}
+#getting sensitivity metric
+Cissushypoglauca.Bmodel <- Sensitivitymodel(speciesselected = "Cissus hypoglauca.B") 
+Cissushypoglauca.Bsensitivity <- Sensitivitymetric(model = Cissushypoglauca.Bmodel) 
+
+#getting sensitivity SE
+for(j in 1:10000){
+  coeff_rep <- rmvnorm(1, mean = Cissushypoglauca.Bmodel$coefficients, sigma = vcov(Cissushypoglauca.Bmodel))
+  Sensitivity_Metric_rep_parboot[j] <- sqrt(
+    (coeff_rep[2]^2+coeff_rep[3]^2+(coeff_rep[3]-coeff_rep[2])^2)/3)
+}
+Cissushypoglauca.BSE <- sd(Sensitivity_Metric_rep_parboot)
+
+#printing the values so I can record them for the spreadsheet! :) 
+print(Cissushypoglauca.Bsensitivity) #save this number
+print(Cissushypoglauca.BSE) #save this number
+```
+
+29. Cissus hypoglauca.D
+#This species was collected from Dorrigo National Park
+```{r}
+#getting sensitivity metric
+Cissushypoglauca.Dmodel <- Sensitivitymodel(speciesselected = "Cissus hypoglauca.D") 
+Cissushypoglauca.Dsensitivity <- Sensitivitymetric(model = Cissushypoglauca.Dmodel) 
+
+#getting sensitivity SE
+for(j in 1:10000){
+  coeff_rep <- rmvnorm(1, mean = Cissushypoglauca.Dmodel$coefficients, sigma = vcov(Cissushypoglauca.Dmodel))
+  Sensitivity_Metric_rep_parboot[j] <- sqrt(
+    (coeff_rep[2]^2+coeff_rep[3]^2+(coeff_rep[3]-coeff_rep[2])^2)/3)
+}
+Cissushypoglauca.DSE <- sd(Sensitivity_Metric_rep_parboot)
+
+#printing the values so I can record them for the spreadsheet! :) 
+print(Cissushypoglauca.Dsensitivity) #save this number
+print(Cissushypoglauca.DSE) #save this number
+summary(Cissushypoglauca.Dmodel)
+```
+
+```{r}
+Cissushypoglauca.D.emmeans <- emmeans(Cissushypoglauca.Dmodel, "Treatment")
+pairs(Cissushypoglauca.D.emmeans)
+```
+
+30. Cissus hypoglauca.M
+#This species was collected from Mallanganee National Park
+```{r}
+#getting sensitivity metric
+Cissushypoglauca.Mmodel <- Sensitivitymodel(speciesselected = "Cissus hypoglauca.M") 
+Cissushypoglauca.Msensitivity <- Sensitivitymetric(model = Cissushypoglauca.Mmodel) 
+
+#getting sensitivity SE
+for(j in 1:10000){
+  coeff_rep <- rmvnorm(1, mean = Cissushypoglauca.Mmodel$coefficients, sigma = vcov(Cissushypoglauca.Mmodel))
+  Sensitivity_Metric_rep_parboot[j] <- sqrt(
+    (coeff_rep[2]^2+coeff_rep[3]^2+(coeff_rep[3]-coeff_rep[2])^2)/3)
+}
+Cissushypoglauca.MSE <- sd(Sensitivity_Metric_rep_parboot)
+
+#printing the values so I can record them for the spreadsheet! :) 
+print(Cissushypoglauca.Msensitivity) #save this number
+print(Cissushypoglauca.MSE) #save this number
+```
+
+31. Cordyline petiolaris 
+```{r}
+#getting sensitivity metric
+Cordylinepetiolarismodel <- Sensitivitymodel(speciesselected = "Cordyline petiolaris") 
+Cordylinepetiolarissensitivity <- Sensitivitymetric(model = Cordylinepetiolarismodel) 
+
+#getting sensitivity SE
+for(j in 1:10000){
+  coeff_rep <- rmvnorm(1, mean = Cordylinepetiolarismodel$coefficients, sigma = vcov(Cordylinepetiolarismodel))
+  Sensitivity_Metric_rep_parboot[j] <- sqrt(
+    (coeff_rep[2]^2+coeff_rep[3]^2+(coeff_rep[3]-coeff_rep[2])^2)/3)
+}
+CordylinepetiolarisSE <- sd(Sensitivity_Metric_rep_parboot)
+
+#printing the values so I can record them for the spreadsheet! :) 
+print(Cordylinepetiolarissensitivity) #save this number
+print(CordylinepetiolarisSE) #save this number
+```
+
+32. Coronidium boormanii
+```{r}
+#getting sensitivity metric
+Coronidiumboormaniimodel <- Sensitivitymodel(speciesselected = "Coronidium boormanii") 
+Coronidiumboormaniisensitivity <- Sensitivitymetric(model = Coronidiumboormaniimodel) 
+
+#getting sensitivity SE
+for(j in 1:10000){
+  coeff_rep <- rmvnorm(1, mean = Coronidiumboormaniimodel$coefficients, sigma = vcov(Coronidiumboormaniimodel))
+  Sensitivity_Metric_rep_parboot[j] <- sqrt(
+    (coeff_rep[2]^2+coeff_rep[3]^2+(coeff_rep[3]-coeff_rep[2])^2)/3)
+}
+CoronidiumboormaniiSE <- sd(Sensitivity_Metric_rep_parboot)
+
+#printing the values so I can record them for the spreadsheet! :) 
+print(Coronidiumboormaniisensitivity) #save this number
+print(CoronidiumboormaniiSE) #save this number
+summary(Coronidiumboormaniimodel)
+```
+
+```{r}
+Coronidiumboormanii.emmeans <- emmeans(Coronidiumboormaniimodel, "Treatment")
+pairs(Coronidiumboormanii.emmeans)
+```
+
+33. Coronidium scorpiodes
+```{r}
+#getting sensitivity metric
+Coronidiumscorpiodesmodel <- Sensitivitymodel(speciesselected = "Coronidium scorpiodes") 
+Coronidiumscorpiodessensitivity <- Sensitivitymetric(model = Coronidiumscorpiodesmodel) 
+
+#getting sensitivity SE
+for(j in 1:10000){
+  coeff_rep <- rmvnorm(1, mean = Coronidiumscorpiodesmodel$coefficients, sigma = vcov(Coronidiumscorpiodesmodel))
+  Sensitivity_Metric_rep_parboot[j] <- sqrt(
+    (coeff_rep[2]^2+coeff_rep[3]^2+(coeff_rep[3]-coeff_rep[2])^2)/3)
+}
+CoronidiumscorpiodesSE <- sd(Sensitivity_Metric_rep_parboot)
+
+#printing the values so I can record them for the spreadsheet! :) 
+print(Coronidiumscorpiodessensitivity) #save this number
+print(CoronidiumscorpiodesSE) #save this number
+summary(Coronidiumscorpiodesmodel)
+```
+
+```{r}
+Coronidiumscorpiodes.emmeans <- emmeans(Coronidiumscorpiodesmodel, "Treatment")
+pairs(Coronidiumscorpiodes.emmeans)
+```
+
+34. Croton insularis
+```{r}
+#getting sensitivity metric
+Crotoninsularismodel <- Sensitivitymodel(speciesselected = "Croton insularis") 
+Crotoninsularissensitivity <- Sensitivitymetric(model = Crotoninsularismodel) 
+
+#getting sensitivity SE
+for(j in 1:10000){
+  coeff_rep <- rmvnorm(1, mean = Crotoninsularismodel$coefficients, sigma = vcov(Crotoninsularismodel))
+  Sensitivity_Metric_rep_parboot[j] <- sqrt(
+    (coeff_rep[2]^2+coeff_rep[3]^2+(coeff_rep[3]-coeff_rep[2])^2)/3)
+}
+CrotoninsularisSE <- sd(Sensitivity_Metric_rep_parboot)
+
+#printing the values so I can record them for the spreadsheet! :) 
+print(Crotoninsularissensitivity) #save this number
+print(CrotoninsularisSE) #save this number
+summary(Crotoninsularismodel)
+```
+
+```{r}
+Crotoninsularis.emmeans <- emmeans(Crotoninsularismodel, "Treatment")
+pairs(Crotoninsularis.emmeans)
+```
+
+35. Cryptocarya microneura
+```{r}
+#getting sensitivity metric
+Cryptocaryamicroneuramodel <- Sensitivitymodel(speciesselected = "Cryptocarya microneura") 
+Cryptocaryamicroneurasensitivity <- Sensitivitymetric(model = Cryptocaryamicroneuramodel) 
+
+#getting sensitivity SE
+for(j in 1:10000){
+  coeff_rep <- rmvnorm(1, mean = Cryptocaryamicroneuramodel$coefficients, sigma = vcov(Cryptocaryamicroneuramodel))
+  Sensitivity_Metric_rep_parboot[j] <- sqrt(
+    (coeff_rep[2]^2+coeff_rep[3]^2+(coeff_rep[3]-coeff_rep[2])^2)/3)
+}
+CryptocaryamicroneuraSE <- sd(Sensitivity_Metric_rep_parboot)
+
+#printing the values so I can record them for the spreadsheet! :) 
+print(Cryptocaryamicroneurasensitivity) #save this number
+print(CryptocaryamicroneuraSE) #save this number
+```
+
+36. Cupaniopsis flagelliformis
+```{r}
+#getting sensitivity metric
+Cupaniopsisflagelliformismodel <- Sensitivitymodel(speciesselected = "Cupaniopsis flagelliformis") 
+Cupaniopsisflagelliformissensitivity <- Sensitivitymetric(model = Cupaniopsisflagelliformismodel) 
+
+#getting sensitivity SE
+for(j in 1:10000){
+  coeff_rep <- rmvnorm(1, mean = Cupaniopsisflagelliformismodel$coefficients, sigma = vcov(Cupaniopsisflagelliformismodel))
+  Sensitivity_Metric_rep_parboot[j] <- sqrt(
+    (coeff_rep[2]^2+coeff_rep[3]^2+(coeff_rep[3]-coeff_rep[2])^2)/3)
+}
+CupaniopsisflagelliformisSE <- sd(Sensitivity_Metric_rep_parboot)
+
+#printing the values so I can record them for the spreadsheet! :) 
+print(Cupaniopsisflagelliformissensitivity) #save this number
+print(CupaniopsisflagelliformisSE) #save this number
+summary(Cupaniopsisflagelliformismodel)
+```
+
+```{r}
+Cupaniopsisflagelliformis.emmeans <- emmeans(Cupaniopsisflagelliformismodel, "Treatment")
+pairs(Cupaniopsisflagelliformis.emmeans)
+```
+
+37. Ehretia acuminata
+```{r}
+#getting sensitivity metric
+Ehretiaacuminatamodel <- Sensitivitymodel(speciesselected = "Ehretia acuminata") 
+Ehretiaacuminatasensitivity <- Sensitivitymetric(model = Ehretiaacuminatamodel) 
+
+#getting sensitivity SE
+for(j in 1:10000){
+  coeff_rep <- rmvnorm(1, mean = Ehretiaacuminatamodel$coefficients, sigma = vcov(Ehretiaacuminatamodel))
+  Sensitivity_Metric_rep_parboot[j] <- sqrt(
+    (coeff_rep[2]^2+coeff_rep[3]^2+(coeff_rep[3]-coeff_rep[2])^2)/3)
+}
+EhretiaacuminataSE <- sd(Sensitivity_Metric_rep_parboot)
+
+#printing the values so I can record them for the spreadsheet! :) 
+print(Ehretiaacuminatasensitivity) #save this number
+print(EhretiaacuminataSE) #save this number
+```
+
+38. Einadia nutans 
+```{r}
+#getting sensitivity metric
+Einadianutansmodel <- Sensitivitymodel(speciesselected = "Einadia nutans") 
+Einadianutanssensitivity <- Sensitivitymetric(model = Einadianutansmodel) 
+
+#getting sensitivity SE
+for(j in 1:10000){
+  coeff_rep <- rmvnorm(1, mean = Einadianutansmodel$coefficients, sigma = vcov(Einadianutansmodel))
+  Sensitivity_Metric_rep_parboot[j] <- sqrt(
+    (coeff_rep[2]^2+coeff_rep[3]^2+(coeff_rep[3]-coeff_rep[2])^2)/3)
+}
+EinadianutansSE <- sd(Sensitivity_Metric_rep_parboot)
+
+#printing the values so I can record them for the spreadsheet! :) 
+print(Einadianutanssensitivity) #save this number
+print(EinadianutansSE) #save this number
+summary(Einadianutansmodel)
+```
+
+```{r}
+Einadianutans.emmeans <- emmeans(Einadianutansmodel, "Treatment")
+pairs(Einadianutans.emmeans)
+```
+
+39. Epacris microphylla
+```{r}
+#getting sensitivity metric
+Epacrismicrophyllamodel <- Sensitivitymodel(speciesselected = "Epacris microphylla") 
+Epacrismicrophyllasensitivity <- Sensitivitymetric(model = Epacrismicrophyllamodel) 
+
+#getting sensitivity SE
+for(j in 1:10000){
+  coeff_rep <- rmvnorm(1, mean = Epacrismicrophyllamodel$coefficients, sigma = vcov(Epacrismicrophyllamodel))
+  Sensitivity_Metric_rep_parboot[j] <- sqrt(
+    (coeff_rep[2]^2+coeff_rep[3]^2+(coeff_rep[3]-coeff_rep[2])^2)/3)
+}
+EpacrismicrophyllaSE <- sd(Sensitivity_Metric_rep_parboot)
+
+#printing the values so I can record them for the spreadsheet! :) 
+print(Epacrismicrophyllasensitivity) #save this number
+print(EpacrismicrophyllaSE) #save this number
+```
+
+40. Eucalyptus cloeziana
+```{r}
+#getting sensitivity metric
+Eucalyptuscloezianamodel <- Sensitivitymodel(speciesselected = "Eucalyptus cloeziana") 
+Eucalyptuscloezianasensitivity <- Sensitivitymetric(model = Eucalyptuscloezianamodel) 
+
+#getting sensitivity SE
+for(j in 1:10000){
+  coeff_rep <- rmvnorm(1, mean = Eucalyptuscloezianamodel$coefficients, sigma = vcov(Eucalyptuscloezianamodel))
+  Sensitivity_Metric_rep_parboot[j] <- sqrt(
+    (coeff_rep[2]^2+coeff_rep[3]^2+(coeff_rep[3]-coeff_rep[2])^2)/3)
+}
+EucalyptuscloezianaSE <- sd(Sensitivity_Metric_rep_parboot)
+
+#printing the values so I can record them for the spreadsheet! :) 
+print(Eucalyptuscloezianasensitivity) #save this number
+print(EucalyptuscloezianaSE) #save this number
+summary(Eucalyptuscloezianamodel)
+```
+
+```{r}
+Eucalyptuscloeziana.emmeans <- emmeans(Eucalyptuscloezianamodel, "Treatment")
+pairs(Eucalyptuscloeziana.emmeans)
+```
+
+41. Eucalyptus dalrympleana
+```{r}
+#getting sensitivity metric
+Eucalyptusdalrympleanamodel <- Sensitivitymodel(speciesselected = "Eucalyptus dalrympleana") 
+Eucalyptusdalrympleanasensitivity <- Sensitivitymetric(model = Eucalyptusdalrympleanamodel) 
+
+#getting sensitivity SE
+for(j in 1:10000){
+  coeff_rep <- rmvnorm(1, mean = Eucalyptusdalrympleanamodel$coefficients, sigma = vcov(Eucalyptusdalrympleanamodel))
+  Sensitivity_Metric_rep_parboot[j] <- sqrt(
+    (coeff_rep[2]^2+coeff_rep[3]^2+(coeff_rep[3]-coeff_rep[2])^2)/3)
+}
+EucalyptusdalrympleanaSE <- sd(Sensitivity_Metric_rep_parboot)
+
+#printing the values so I can record them for the spreadsheet! :) 
+print(Eucalyptusdalrympleanasensitivity) #save this number
+print(EucalyptusdalrympleanaSE) #save this number
+summary(Eucalyptusdalrympleanamodel)
+```
+
+```{r}
+Eucalyptusdalrympleana.emmeans <- emmeans(Eucalyptusdalrympleanamodel, "Treatment")
+pairs(Eucalyptusdalrympleana.emmeans)
+```
+
+42. Eucalyptus ebbaneoensis subsp. Ebbanoensis
+```{r}
+#getting sensitivity metric
+Eucalyptusebbaneoensismodel <- Sensitivitymodel(speciesselected = "Eucalyptus ebbaneoensis subsp. Ebbanoensis") 
+Eucalyptusebbaneoensissensitivity <- Sensitivitymetric(model = Eucalyptusebbaneoensismodel) 
+
+#getting sensitivity SE
+for(j in 1:10000){
+  coeff_rep <- rmvnorm(1, mean = Eucalyptusebbaneoensismodel$coefficients, sigma = vcov(Eucalyptusebbaneoensismodel))
+  Sensitivity_Metric_rep_parboot[j] <- sqrt(
+    (coeff_rep[2]^2+coeff_rep[3]^2+(coeff_rep[3]-coeff_rep[2])^2)/3)
+}
+EucalyptusebbaneoensisSE <- sd(Sensitivity_Metric_rep_parboot)
+
+#printing the values so I can record them for the spreadsheet! :) 
+print(Eucalyptusebbaneoensissensitivity) #save this number
+print(EucalyptusebbaneoensisSE) #save this number
+summary(Eucalyptusebbaneoensismodel)
+```
+
+```{r}
+Eucalyptusebbaneoensis.emmeans <- emmeans(Eucalyptusebbaneoensismodel, "Treatment")
+pairs(Eucalyptusebbaneoensis.emmeans)
+```
+
+43. Eucalyptus lockyeri
+```{r}
+#getting sensitivity metric
+Eucalyptuslockyerimodel <- Sensitivitymodel(speciesselected = "Eucalyptus lockyeri") 
+Eucalyptuslockyerisensitivity <- Sensitivitymetric(model = Eucalyptuslockyerimodel) 
+
+#getting sensitivity SE
+for(j in 1:10000){
+  coeff_rep <- rmvnorm(1, mean = Eucalyptuslockyerimodel$coefficients, sigma = vcov(Eucalyptuslockyerimodel))
+  Sensitivity_Metric_rep_parboot[j] <- sqrt(
+    (coeff_rep[2]^2+coeff_rep[3]^2+(coeff_rep[3]-coeff_rep[2])^2)/3)
+}
+EucalyptuslockyeriSE <- sd(Sensitivity_Metric_rep_parboot)
+
+#printing the values so I can record them for the spreadsheet! :) 
+print(Eucalyptuslockyerisensitivity) #save this number
+print(EucalyptuslockyeriSE) #save this number
+summary(Eucalyptuslockyerimodel)
+```
+
+```{r}
+Eucalyptuslockyeri.emmeans <- emmeans(Eucalyptuslockyerimodel, "Treatment")
+pairs(Eucalyptuslockyeri.emmeans)
+```
+
+44. Eucalyptus pauciflora
+```{r}
+#getting sensitivity metric
+Eucalyptuspaucifloramodel <- Sensitivitymodel(speciesselected = "Eucalyptus pauciflora") 
+Eucalyptuspauciflorasensitivity <- Sensitivitymetric(model = Eucalyptuspaucifloramodel) 
+
+#getting sensitivity SE
+for(j in 1:10000){
+  coeff_rep <- rmvnorm(1, mean = Eucalyptuspaucifloramodel$coefficients, sigma = vcov(Eucalyptuspaucifloramodel))
+  Sensitivity_Metric_rep_parboot[j] <- sqrt(
+    (coeff_rep[2]^2+coeff_rep[3]^2+(coeff_rep[3]-coeff_rep[2])^2)/3)
+}
+EucalyptuspaucifloraSE <- sd(Sensitivity_Metric_rep_parboot)
+
+#printing the values so I can record them for the spreadsheet! :) 
+print(Eucalyptuspauciflorasensitivity) #save this number
+print(EucalyptuspaucifloraSE) #save this number
+summary(Eucalyptuspaucifloramodel)
+```
+
+```{r}
+Eucalyptuspauciflora.emmeans <- emmeans(Eucalyptuspaucifloramodel, "Treatment")
+pairs(Eucalyptuspauciflora.emmeans) 
+```
+
+45. Eucalyptus shirleyi
+```{r}
+#getting sensitivity metric
+Eucalyptusshirleyimodel <- Sensitivitymodel(speciesselected = "Eucalyptus shirleyi") 
+Eucalyptusshirleyisensitivity <- Sensitivitymetric(model = Eucalyptusshirleyimodel) 
+
+#getting sensitivity SE
+for(j in 1:10000){
+  coeff_rep <- rmvnorm(1, mean = Eucalyptusshirleyimodel$coefficients, sigma = vcov(Eucalyptusshirleyimodel))
+  Sensitivity_Metric_rep_parboot[j] <- sqrt(
+    (coeff_rep[2]^2+coeff_rep[3]^2+(coeff_rep[3]-coeff_rep[2])^2)/3)
+}
+EucalyptusshirleyiSE <- sd(Sensitivity_Metric_rep_parboot)
+
+#printing the values so I can record them for the spreadsheet! :) 
+print(Eucalyptusshirleyisensitivity) #save this number
+print(EucalyptusshirleyiSE) #save this number
+summary(Eucalyptusshirleyimodel)
+```
+
+```{r}
+Eucalyptusshirleyi.emmeans <- emmeans(Eucalyptusshirleyimodel, "Treatment")
+pairs(Eucalyptusshirleyi.emmeans)
+```
+
+46. Eucalyptus websteriana subsp. norsemanica
+```{r}
+#getting sensitivity metric
+Eucalyptuswebsterianamodel <- Sensitivitymodel(speciesselected = "Eucalyptus websteriana subsp. norsemanica") 
+Eucalyptuswebsterianasensitivity <- Sensitivitymetric(model = Eucalyptuswebsterianamodel) 
+
+#getting sensitivity SE
+for(j in 1:10000){
+  coeff_rep <- rmvnorm(1, mean = Eucalyptuswebsterianamodel$coefficients, sigma = vcov(Eucalyptuswebsterianamodel))
+  Sensitivity_Metric_rep_parboot[j] <- sqrt(
+    (coeff_rep[2]^2+coeff_rep[3]^2+(coeff_rep[3]-coeff_rep[2])^2)/3)
+}
+EucalyptuswebsterianaSE <- sd(Sensitivity_Metric_rep_parboot)
+
+#printing the values so I can record them for the spreadsheet! :) 
+print(Eucalyptuswebsterianasensitivity) #save this number
+print(EucalyptuswebsterianaSE) #save this number
+summary(Eucalyptuswebsterianamodel)
+```
+
+```{r}
+Eucalyptuswebsteriana.emmeans <- emmeans(Eucalyptuswebsterianamodel, "Treatment")
+pairs(Eucalyptuswebsteriana.emmeans)
+```
+
+47. Euphrasia collina subsp. diversicolor
+```{r}
+#getting sensitivity metric
+Euphrasiadiversicolormodel <- Sensitivitymodel(speciesselected = "Euphrasia collina subsp. diversicolor") 
+Euphrasiadiversicolorsensitivity <- Sensitivitymetric(model = Euphrasiadiversicolormodel) 
+
+#getting sensitivity SE
+for(j in 1:10000){
+  coeff_rep <- rmvnorm(1, mean = Euphrasiadiversicolormodel$coefficients, sigma = vcov(Euphrasiadiversicolormodel))
+  Sensitivity_Metric_rep_parboot[j] <- sqrt(
+    (coeff_rep[2]^2+coeff_rep[3]^2+(coeff_rep[3]-coeff_rep[2])^2)/3)
+}
+EuphrasiadiversicolorSE <- sd(Sensitivity_Metric_rep_parboot)
+
+#printing the values so I can record them for the spreadsheet! :) 
+print(Euphrasiadiversicolorsensitivity) #save this number
+print(EuphrasiadiversicolorSE) #save this number
+```
+
+48. Ficus benjamina
+```{r}
+#getting sensitivity metric
+Ficusbenjaminamodel <- Sensitivitymodel(speciesselected = "Ficus benjamina") 
+Ficusbenjaminasensitivity <- Sensitivitymetric(model = Ficusbenjaminamodel) 
+
+#getting sensitivity SE
+for(j in 1:10000){
+  coeff_rep <- rmvnorm(1, mean = Ficusbenjaminamodel$coefficients, sigma = vcov(Ficusbenjaminamodel))
+  Sensitivity_Metric_rep_parboot[j] <- sqrt(
+    (coeff_rep[2]^2+coeff_rep[3]^2+(coeff_rep[3]-coeff_rep[2])^2)/3)
+}
+FicusbenjaminaSE <- sd(Sensitivity_Metric_rep_parboot)
+
+#printing the values so I can record them for the spreadsheet! :) 
+print(Ficusbenjaminasensitivity) #save this number
+print(FicusbenjaminaSE) #save this number
+summary(Ficusbenjaminamodel)
+```
+
+```{r}
+Ficusbenjamina.emmeans <- emmeans(Ficusbenjaminamodel, "Treatment")
+pairs(Ficusbenjamina.emmeans)
+```
+
+49. Ganophyllum falcatum
+```{r}
+#getting sensitivity metric
+Ganophyllumfalcatummodel <- Sensitivitymodel(speciesselected = "Ganophyllum falcatum") 
+Ganophyllumfalcatumsensitivity <- Sensitivitymetric(model = Ganophyllumfalcatummodel) 
+
+#getting sensitivity SE
+for(j in 1:10000){
+  coeff_rep <- rmvnorm(1, mean = Ganophyllumfalcatummodel$coefficients, sigma = vcov(Ganophyllumfalcatummodel))
+  Sensitivity_Metric_rep_parboot[j] <- sqrt(
+    (coeff_rep[2]^2+coeff_rep[3]^2+(coeff_rep[3]-coeff_rep[2])^2)/3)
+}
+GanophyllumfalcatumSE <- sd(Sensitivity_Metric_rep_parboot)
+
+#printing the values so I can record them for the spreadsheet! :) 
+print(Ganophyllumfalcatumsensitivity) #save this number
+print(GanophyllumfalcatumSE) #save this number
+```
+
+50. Geitonoplesium cymosum
+```{r}
+#getting sensitivity metric
+Geitonoplesiumcymosummodel <- Sensitivitymodel(speciesselected = "Geitonoplesium cymosum") 
+Geitonoplesiumcymosumsensitivity <- Sensitivitymetric(model = Geitonoplesiumcymosummodel) 
+
+#getting sensitivity SE
+for(j in 1:10000){
+  coeff_rep <- rmvnorm(1, mean = Geitonoplesiumcymosummodel$coefficients, sigma = vcov(Geitonoplesiumcymosummodel))
+  Sensitivity_Metric_rep_parboot[j] <- sqrt(
+    (coeff_rep[2]^2+coeff_rep[3]^2+(coeff_rep[3]-coeff_rep[2])^2)/3)
+}
+GeitonoplesiumcymosumSE <- sd(Sensitivity_Metric_rep_parboot)
+
+#printing the values so I can record them for the spreadsheet! :) 
+print(Geitonoplesiumcymosumsensitivity) #save this number
+print(GeitonoplesiumcymosumSE) #save this number
+```
+
+51. Glochidion ferdinandi
+```{r}
+#getting sensitivity metric
+Glochidionferdinandimodel <- Sensitivitymodel(speciesselected = "Glochidion ferdinandi") 
+Glochidionferdinandisensitivity <- Sensitivitymetric(model = Glochidionferdinandimodel) 
+
+#getting sensitivity SE
+for(j in 1:10000){
+  coeff_rep <- rmvnorm(1, mean = Glochidionferdinandimodel$coefficients, sigma = vcov(Glochidionferdinandimodel))
+  Sensitivity_Metric_rep_parboot[j] <- sqrt(
+    (coeff_rep[2]^2+coeff_rep[3]^2+(coeff_rep[3]-coeff_rep[2])^2)/3)
+}
+GlochidionferdinandiSE <- sd(Sensitivity_Metric_rep_parboot)
+
+#printing the values so I can record them for the spreadsheet! :) 
+print(Glochidionferdinandisensitivity) #save this number
+print(GlochidionferdinandiSE) #save this number
+summary(Glochidionferdinandimodel)
+```
+
+```{r}
+Glochidionferdinandi.emmeans <- emmeans(Glochidionferdinandimodel, "Treatment")
+pairs(Glochidionferdinandi.emmeans)
+```
+
+52. Grevillea glauca
+```{r}
+#getting sensitivity metric
+Grevilleaglaucamodel <- Sensitivitymodel(speciesselected = "Grevillea glauca") 
+Grevilleaglaucasensitivity <- Sensitivitymetric(model = Grevilleaglaucamodel) 
+
+#getting sensitivity SE
+for(j in 1:10000){
+  coeff_rep <- rmvnorm(1, mean = Grevilleaglaucamodel$coefficients, sigma = vcov(Grevilleaglaucamodel))
+  Sensitivity_Metric_rep_parboot[j] <- sqrt(
+    (coeff_rep[2]^2+coeff_rep[3]^2+(coeff_rep[3]-coeff_rep[2])^2)/3)
+}
+GrevilleaglaucaSE <- sd(Sensitivity_Metric_rep_parboot)
+
+#printing the values so I can record them for the spreadsheet! :) 
+print(Grevilleaglaucasensitivity) #save this number
+print(GrevilleaglaucaSE) #save this number
+```
+
+53. Hakea dactyloides.R
+#This species was collected from Royal National Park- Flat Rock Creek
+```{r}
+#getting sensitivity metric
+Hakeadactyloides.Rmodel <- Sensitivitymodel(speciesselected = "Hakea dactyloides.R") 
+Hakeadactyloides.Rsensitivity <- Sensitivitymetric(model = Hakeadactyloides.Rmodel) 
+
+#getting sensitivity SE
+for(j in 1:10000){
+  coeff_rep <- rmvnorm(1, mean = Hakeadactyloides.Rmodel$coefficients, sigma = vcov(Hakeadactyloides.Rmodel))
+  Sensitivity_Metric_rep_parboot[j] <- sqrt(
+    (coeff_rep[2]^2+coeff_rep[3]^2+(coeff_rep[3]-coeff_rep[2])^2)/3)
+}
+Hakeadactyloides.RSE <- sd(Sensitivity_Metric_rep_parboot)
+
+#printing the values so I can record them for the spreadsheet! :) 
+print(Hakeadactyloides.Rsensitivity) #save this number
+print(Hakeadactyloides.RSE) #save this number
+summary(Hakeadactyloides.Rmodel)
+```
+
+```{r}
+Hakeadactyloides.R.emmeans <- emmeans(Hakeadactyloides.Rmodel, "Treatment")
+pairs(Hakeadactyloides.R.emmeans)
+```
+
+54. Hakea dactyloides.RC
+#This species was collected from Rocky Creek
+```{r}
+#getting sensitivity metric
+Hakeadactyloides.RCmodel <- Sensitivitymodel(speciesselected = "Hakea dactyloides.RC") 
+Hakeadactyloides.RCsensitivity <- Sensitivitymetric(model = Hakeadactyloides.RCmodel) 
+
+#getting sensitivity SE
+for(j in 1:10000){
+  coeff_rep <- rmvnorm(1, mean = Hakeadactyloides.RCmodel$coefficients, sigma = vcov(Hakeadactyloides.RCmodel))
+  Sensitivity_Metric_rep_parboot[j] <- sqrt(
+    (coeff_rep[2]^2+coeff_rep[3]^2+(coeff_rep[3]-coeff_rep[2])^2)/3)
+}
+Hakeadactyloides.RCSE <- sd(Sensitivity_Metric_rep_parboot)
+
+#printing the values so I can record them for the spreadsheet! :) 
+print(Hakeadactyloides.RCsensitivity) #save this number
+print(Hakeadactyloides.RCSE) #save this number
+summary(Hakeadactyloides.RCmodel)
+```
+
+```{r}
+Hakeadactyloides.RC.emmeans <- emmeans(Hakeadactyloides.RCmodel, "Treatment")
+pairs(Hakeadactyloides.RC.emmeans)
+```
+
+55. Hakea microcarpa
+```{r}
+#getting sensitivity metric
+Hakeamicrocarpamodel <- Sensitivitymodel(speciesselected = "Hakea microcarpa") 
+Hakeamicrocarpasensitivity <- Sensitivitymetric(model = Hakeamicrocarpamodel) 
+
+#getting sensitivity SE
+for(j in 1:10000){
+  coeff_rep <- rmvnorm(1, mean = Hakeamicrocarpamodel$coefficients, sigma = vcov(Hakeamicrocarpamodel))
+  Sensitivity_Metric_rep_parboot[j] <- sqrt(
+    (coeff_rep[2]^2+coeff_rep[3]^2+(coeff_rep[3]-coeff_rep[2])^2)/3)
+}
+HakeamicrocarpaSE <- sd(Sensitivity_Metric_rep_parboot)
+
+#printing the values so I can record them for the spreadsheet! :) 
+print(Hakeamicrocarpasensitivity) #save this number
+print(HakeamicrocarpaSE) #save this number
+summary(Hakeamicrocarpamodel)
+```
+
+```{r}
+Hakeamicrocarpaemmeans <- emmeans(Hakeamicrocarpamodel, "Treatment")
+pairs(Hakeamicrocarpaemmeans)
+```
+
+56. Hakea sericea
+```{r}
+#getting sensitivity metric
+Hakeasericeamodel <- Sensitivitymodel(speciesselected = "Hakea sericea") 
+Hakeasericeasensitivity <- Sensitivitymetric(model = Hakeasericeamodel) 
+
+#getting sensitivity SE
+for(j in 1:10000){
+  coeff_rep <- rmvnorm(1, mean = Hakeasericeamodel$coefficients, sigma = vcov(Hakeasericeamodel))
+  Sensitivity_Metric_rep_parboot[j] <- sqrt(
+    (coeff_rep[2]^2+coeff_rep[3]^2+(coeff_rep[3]-coeff_rep[2])^2)/3)
+}
+HakeasericeaSE <- sd(Sensitivity_Metric_rep_parboot)
+
+#printing the values so I can record them for the spreadsheet! :) 
+print(Hakeasericeasensitivity) #save this number
+print(HakeasericeaSE) #save this number
+summary(Hakeasericeamodel)
+```
+
+```{r}
+Hakeasericeaemmeans <- emmeans(Hakeasericeamodel, "Treatment")
+pairs(Hakeasericeaemmeans)
+```
+
+57. Homalanthus populifolius
+```{r}
+#getting sensitivity metric
+Homalanthuspopulifoliusmodel <- Sensitivitymodel(speciesselected = "Homalanthus populifolius") 
+Homalanthuspopulifoliussensitivity <- Sensitivitymetric(model = Homalanthuspopulifoliusmodel) 
+
+#getting sensitivity SE
+for(j in 1:10000){
+  coeff_rep <- rmvnorm(1, mean = Homalanthuspopulifoliusmodel$coefficients, sigma = vcov(Homalanthuspopulifoliusmodel))
+  Sensitivity_Metric_rep_parboot[j] <- sqrt(
+    (coeff_rep[2]^2+coeff_rep[3]^2+(coeff_rep[3]-coeff_rep[2])^2)/3)
+}
+HomalanthuspopulifoliusSE <- sd(Sensitivity_Metric_rep_parboot)
+
+#printing the values so I can record them for the spreadsheet! :) 
+print(Homalanthuspopulifoliussensitivity) #save this number
+print(HomalanthuspopulifoliusSE) #save this number
+```
+
+58. Isotoma anethifolia
+```{r}
+#getting sensitivity metric
+Isotomaanethifoliamodel <- Sensitivitymodel(speciesselected = "Isotoma anethifolia") 
+Isotomaanethifoliasensitivity <- Sensitivitymetric(model = Isotomaanethifoliamodel) 
+
+#getting sensitivity SE
+for(j in 1:10000){
+  coeff_rep <- rmvnorm(1, mean = Isotomaanethifoliamodel$coefficients, sigma = vcov(Isotomaanethifoliamodel))
+  Sensitivity_Metric_rep_parboot[j] <- sqrt(
+    (coeff_rep[2]^2+coeff_rep[3]^2+(coeff_rep[3]-coeff_rep[2])^2)/3)
+}
+IsotomaanethifoliaSE <- sd(Sensitivity_Metric_rep_parboot)
+
+#printing the values so I can record them for the spreadsheet! :) 
+print(Isotomaanethifoliasensitivity) #save this number
+print(IsotomaanethifoliaSE) #save this number
+summary(Isotomaanethifoliamodel)
+```
+
+```{r}
+Isotomaanethifolia.emmeans <- emmeans(Isotomaanethifoliamodel, "Treatment")
+pairs(Isotomaanethifolia.emmeans)
+```
+
+59. Kunzea ericoides
+```{r}
+#getting sensitivity metric
+Kunzeaericoidesmodel <- Sensitivitymodel(speciesselected = "Kunzea ericoides") 
+Kunzeaericoidessensitivity <- Sensitivitymetric(model = Kunzeaericoidesmodel) 
+
+#getting sensitivity SE
+for(j in 1:10000){
+  coeff_rep <- rmvnorm(1, mean = Kunzeaericoidesmodel$coefficients, sigma = vcov(Kunzeaericoidesmodel))
+  Sensitivity_Metric_rep_parboot[j] <- sqrt(
+    (coeff_rep[2]^2+coeff_rep[3]^2+(coeff_rep[3]-coeff_rep[2])^2)/3)
+}
+KunzeaericoidesSE <- sd(Sensitivity_Metric_rep_parboot)
+
+#printing the values so I can record them for the spreadsheet! :) 
+print(Kunzeaericoidessensitivity) #save this number
+print(KunzeaericoidesSE) #save this number
+summary(Kunzeaericoidesmodel)
+```
+
+```{r}
+Kunzeaericoides.emmeans <- emmeans(Kunzeaericoidesmodel, "Treatment")
+pairs(Kunzeaericoides.emmeans)
+```
+
+60. Leptospermum arachnoides
+```{r}
+#getting sensitivity metric
+Larachnoidesmodel <- Sensitivitymodel(speciesselected = "Leptospermum arachnoides") 
+Larachnoidessensitivity <- Sensitivitymetric(model = Larachnoidesmodel) 
+
+#getting sensitivity SE
+for(j in 1:10000){
+  coeff_rep <- rmvnorm(1, mean = Larachnoidesmodel$coefficients, sigma = vcov(Larachnoidesmodel))
+  Sensitivity_Metric_rep_parboot[j] <- sqrt(
+    (coeff_rep[2]^2+coeff_rep[3]^2+(coeff_rep[3]-coeff_rep[2])^2)/3)
+}
+LarachnoidesSE <- sd(Sensitivity_Metric_rep_parboot)
+
+#printing the values so I can record them for the spreadsheet! :) 
+print(Larachnoidessensitivity) #save this number
+print(LarachnoidesSE) #save this number
+summary(Larachnoidesmodel)
+```
+
+```{r}
+Larachnoides.emmeans <- emmeans(Larachnoidesmodel, "Treatment")
+pairs(Larachnoides.emmeans)
+```
+
+61. Leptospermum grandifolium
+```{r}
+#getting sensitivity metric
+Lgrandifoliummodel <- Sensitivitymodel(speciesselected = "Leptospermum grandifolium") 
+Lgrandifoliumsensitivity <- Sensitivitymetric(model = Lgrandifoliummodel) 
+
+#getting sensitivity SE
+for(j in 1:10000){
+  coeff_rep <- rmvnorm(1, mean = Lgrandifoliummodel$coefficients, sigma = vcov(Lgrandifoliummodel))
+  Sensitivity_Metric_rep_parboot[j] <- sqrt(
+    (coeff_rep[2]^2+coeff_rep[3]^2+(coeff_rep[3]-coeff_rep[2])^2)/3)
+}
+LgrandifoliumSE <- sd(Sensitivity_Metric_rep_parboot)
+
+#printing the values so I can record them for the spreadsheet! :) 
+print(Lgrandifoliumsensitivity) #save this number
+print(LgrandifoliumSE) #save this number
+summary(Lgrandifoliummodel)
+```
+
+```{r}
+Lgrandifolium.emmeans <- emmeans(Lgrandifoliummodel, "Treatment")
+pairs(Lgrandifolium.emmeans)
+```
+
+62. Leptospermum gregarium
+```{r}
+#getting sensitivity metric
+Lgregariummodel <- Sensitivitymodel(speciesselected = "Leptospermum gregarium") 
+Lgregariumsensitivity <- Sensitivitymetric(model = Lgregariummodel) 
+
+#getting sensitivity SE
+for(j in 1:10000){
+  coeff_rep <- rmvnorm(1, mean = Lgregariummodel$coefficients, sigma = vcov(Lgregariummodel))
+  Sensitivity_Metric_rep_parboot[j] <- sqrt(
+    (coeff_rep[2]^2+coeff_rep[3]^2+(coeff_rep[3]-coeff_rep[2])^2)/3)
+}
+LgregariumSE <- sd(Sensitivity_Metric_rep_parboot)
+
+#printing the values so I can record them for the spreadsheet! :) 
+print(Lgregariumsensitivity) #save this number
+print(LgregariumSE) #save this number
+summary(Lgregariummodel)
+```
+
+```{r}
+Lgregarium.emmeans <- emmeans(Lgregariummodel, "Treatment")
+pairs(Lgregarium.emmeans)
+```
+
+63. Leptospermum juniperinum
+```{r}
+#getting sensitivity metric
+Ljuniperinummodel <- Sensitivitymodel(speciesselected = "Leptospermum juniperinum") 
+Ljuniperinumsensitivity <- Sensitivitymetric(model = Ljuniperinummodel) 
+
+#getting sensitivity SE
+for(j in 1:10000){
+  coeff_rep <- rmvnorm(1, mean = Ljuniperinummodel$coefficients, sigma = vcov(Ljuniperinummodel))
+  Sensitivity_Metric_rep_parboot[j] <- sqrt(
+    (coeff_rep[2]^2+coeff_rep[3]^2+(coeff_rep[3]-coeff_rep[2])^2)/3)
+}
+LjuniperinumSE <- sd(Sensitivity_Metric_rep_parboot)
+
+#printing the values so I can record them for the spreadsheet! :) 
+print(Ljuniperinumsensitivity) #save this number
+print(LjuniperinumSE) #save this number
+summary(Ljuniperinummodel)
+```
+
+```{r}
+Ljuniperinum.emmeans <- emmeans(Ljuniperinummodel, "Treatment")
+pairs(Ljuniperinum.emmeans)
+```
+
+64. Leptospermum laevigatum
+```{r}
+#getting sensitivity metric
+Llaevigatummodel <- Sensitivitymodel(speciesselected = "Leptospermum laevigatum") 
+Llaevigatumsensitivity <- Sensitivitymetric(model = Llaevigatummodel) 
+
+#getting sensitivity SE
+for(j in 1:10000){
+  coeff_rep <- rmvnorm(1, mean = Llaevigatummodel$coefficients, sigma = vcov(Llaevigatummodel))
+  Sensitivity_Metric_rep_parboot[j] <- sqrt(
+    (coeff_rep[2]^2+coeff_rep[3]^2+(coeff_rep[3]-coeff_rep[2])^2)/3)
+}
+LlaevigatumSE <- sd(Sensitivity_Metric_rep_parboot)
+
+#printing the values so I can record them for the spreadsheet! :) 
+print(Llaevigatumsensitivity) #save this number
+print(LlaevigatumSE) #save this number
+summary(Llaevigatummodel)
+```
+
+```{r}
+Llaevigatum.emmeans <- emmeans(Llaevigatummodel, "Treatment")
+pairs(Llaevigatum.emmeans)
+```
+
+65. Leptospermum myrtifolium
+```{r}
+#getting sensitivity metric
+Lmyrtifoliummodel <- Sensitivitymodel(speciesselected = "Leptospermum myrtifolium") 
+Lmyrtifoliumsensitivity <- Sensitivitymetric(model = Lmyrtifoliummodel) 
+
+#getting sensitivity SE
+for(j in 1:10000){
+  coeff_rep <- rmvnorm(1, mean = Lmyrtifoliummodel$coefficients, sigma = vcov(Lmyrtifoliummodel))
+  Sensitivity_Metric_rep_parboot[j] <- sqrt(
+    (coeff_rep[2]^2+coeff_rep[3]^2+(coeff_rep[3]-coeff_rep[2])^2)/3)
+}
+LmyrtifoliumSE <- sd(Sensitivity_Metric_rep_parboot)
+
+#printing the values so I can record them for the spreadsheet! :) 
+print(Lmyrtifoliumsensitivity) #save this number
+print(LmyrtifoliumSE) #save this number
+summary(Lmyrtifoliummodel)
+```
+
+```{r}
+Lmyrtifolium.emmeans <- emmeans(Lmyrtifoliummodel, "Treatment")
+pairs(Lmyrtifolium.emmeans)
+```
+
+66. Leptospermum polygafolium
+```{r}
+#getting sensitivity metric
+Lpolygafoliummodel <- Sensitivitymodel(speciesselected = "Leptospermum polygafolium") 
+Lpolygafoliumsensitivity <- Sensitivitymetric(model = Lpolygafoliummodel) 
+
+#getting sensitivity SE
+for(j in 1:10000){
+  coeff_rep <- rmvnorm(1, mean = Lpolygafoliummodel$coefficients, sigma = vcov(Lpolygafoliummodel))
+  Sensitivity_Metric_rep_parboot[j] <- sqrt(
+    (coeff_rep[2]^2+coeff_rep[3]^2+(coeff_rep[3]-coeff_rep[2])^2)/3)
+}
+LpolygafoliumSE <- sd(Sensitivity_Metric_rep_parboot)
+
+#printing the values so I can record them for the spreadsheet! :) 
+print(Lpolygafoliumsensitivity) #save this number
+print(LpolygafoliumSE) #save this number
+summary(Lpolygafoliummodel)
+```
+
+```{r}
+Lpolygafolium.emmeans <- emmeans(Lpolygafoliummodel, "Treatment")
+pairs(Lpolygafolium.emmeans)
+```
+
+67. Leptospermum polygalifolium subsp. montanum
+```{r}
+#getting sensitivity metric
+Lmontanummodel <- Sensitivitymodel(speciesselected = "Leptospermum polygalifolium subsp. montanum") 
+Lmontanumsensitivity <- Sensitivitymetric(model = Lmontanummodel) 
+
+#getting sensitivity SE
+for(j in 1:10000){
+  coeff_rep <- rmvnorm(1, mean = Lmontanummodel$coefficients, sigma = vcov(Lmontanummodel))
+  Sensitivity_Metric_rep_parboot[j] <- sqrt(
+    (coeff_rep[2]^2+coeff_rep[3]^2+(coeff_rep[3]-coeff_rep[2])^2)/3)
+}
+LmontanumSE <- sd(Sensitivity_Metric_rep_parboot)
+
+#printing the values so I can record them for the spreadsheet! :) 
+print(Lmontanumsensitivity) #save this number
+print(LmontanumSE) #save this number
+summary(Lmontanummodel)
+```
+
+```{r}
+Lmontanum.emmeans <- emmeans(Lmontanummodel, "Treatment")
+pairs(Lmontanum.emmeans)
+```
+
+68. Leucochrysum albicans subsp. alpina
+```{r}
+#getting sensitivity metric
+Lalpinamodel <- Sensitivitymodel(speciesselected = "Leucochrysum albicans subsp. alpina") 
+Lalpinasensitivity <- Sensitivitymetric(model = Lalpinamodel) 
+
+#getting sensitivity SE
+for(j in 1:10000){
+  coeff_rep <- rmvnorm(1, mean = Lalpinamodel$coefficients, sigma = vcov(Lalpinamodel))
+  Sensitivity_Metric_rep_parboot[j] <- sqrt(
+    (coeff_rep[2]^2+coeff_rep[3]^2+(coeff_rep[3]-coeff_rep[2])^2)/3)
+}
+LalpinaSE <- sd(Sensitivity_Metric_rep_parboot)
+
+#printing the values so I can record them for the spreadsheet! :) 
+print(Lalpinasensitivity) #save this number
+print(LalpinaSE) #save this number
+summary(Lalpinamodel)
+```
+
+```{r}
+Lalpina.emmeans <- emmeans(Lalpinamodel, "Treatment")
+pairs(Lalpina.emmeans)
+```
+
+69. Linospadix monostachya.B
+#This species was collected from Border Ranges National Park
+```{r}
+#getting sensitivity metric
+Linospadixmonostachya.Bmodel <- Sensitivitymodel(speciesselected = "Linospadix monostachya.B") 
+Linospadixmonostachya.Bsensitivity <- Sensitivitymetric(model = Linospadixmonostachya.Bmodel) 
+
+#getting sensitivity SE
+for(j in 1:10000){
+  coeff_rep <- rmvnorm(1, mean = Linospadixmonostachya.Bmodel$coefficients, sigma = vcov(Linospadixmonostachya.Bmodel))
+  Sensitivity_Metric_rep_parboot[j] <- sqrt(
+    (coeff_rep[2]^2+coeff_rep[3]^2+(coeff_rep[3]-coeff_rep[2])^2)/3)
+}
+Linospadixmonostachya.BSE <- sd(Sensitivity_Metric_rep_parboot)
+
+#printing the values so I can record them for the spreadsheet! :) 
+print(Linospadixmonostachya.Bsensitivity) #save this number
+print(Linospadixmonostachya.BSE) #save this number
+summary(Linospadixmonostachya.Bmodel)
+```
+
+```{r}
+Linospadixmonostachya.B.emmeans <- emmeans(Linospadixmonostachya.Bmodel, "Treatment")
+pairs(Linospadixmonostachya.B.emmeans)
+```
+
+70. Linospadix monostachya.D
+#This species was collected from Dorrigo National Park
+```{r}
+#getting sensitivity metric
+Linospadixmonostachya.Dmodel <- Sensitivitymodel(speciesselected = "Linospadix monostachya.D") 
+Linospadixmonostachya.Dsensitivity <- Sensitivitymetric(model = Linospadixmonostachya.Dmodel) 
+
+#getting sensitivity SE
+for(j in 1:10000){
+  coeff_rep <- rmvnorm(1, mean = Linospadixmonostachya.Dmodel$coefficients, sigma = vcov(Linospadixmonostachya.Dmodel))
+  Sensitivity_Metric_rep_parboot[j] <- sqrt(
+    (coeff_rep[2]^2+coeff_rep[3]^2+(coeff_rep[3]-coeff_rep[2])^2)/3)
+}
+Linospadixmonostachya.DSE <- sd(Sensitivity_Metric_rep_parboot)
+
+#printing the values so I can record them for the spreadsheet! :) 
+print(Linospadixmonostachya.Dsensitivity) #save this number
+print(Linospadixmonostachya.DSE) #save this number
+```
+
+71. Maytenus disperma
+```{r}
+#getting sensitivity metric
+Maytenusdispermamodel <- Sensitivitymodel(speciesselected = "Maytenus disperma") 
+Maytenusdispermasensitivity <- Sensitivitymetric(model = Maytenusdispermamodel) 
+
+#getting sensitivity SE
+for(j in 1:10000){
+  coeff_rep <- rmvnorm(1, mean = Maytenusdispermamodel$coefficients, sigma = vcov(Maytenusdispermamodel))
+  Sensitivity_Metric_rep_parboot[j] <- sqrt(
+    (coeff_rep[2]^2+coeff_rep[3]^2+(coeff_rep[3]-coeff_rep[2])^2)/3)
+}
+MaytenusdispermaSE <- sd(Sensitivity_Metric_rep_parboot)
+
+#printing the values so I can record them for the spreadsheet! :) 
+print(Maytenusdispermasensitivity) #save this number
+print(MaytenusdispermaSE) #save this number
+```
+
+72. Muehlenbeckia M. sp. Mt Norman
+```{r}
+#getting sensitivity metric
+MuehlenbeckiaNormanmodel <- Sensitivitymodel(speciesselected = "Muehlenbeckia M. sp. Mt Norman") 
+MuehlenbeckiaNormansensitivity <- Sensitivitymetric(model = MuehlenbeckiaNormanmodel) 
+
+#getting sensitivity SE
+for(j in 1:10000){
+  coeff_rep <- rmvnorm(1, mean = MuehlenbeckiaNormanmodel$coefficients, sigma = vcov(MuehlenbeckiaNormanmodel))
+  Sensitivity_Metric_rep_parboot[j] <- sqrt(
+    (coeff_rep[2]^2+coeff_rep[3]^2+(coeff_rep[3]-coeff_rep[2])^2)/3)
+}
+MuehlenbeckiaNormanSE <- sd(Sensitivity_Metric_rep_parboot)
+
+#printing the values so I can record them for the spreadsheet! :) 
+print(MuehlenbeckiaNormansensitivity) #save this number
+print(MuehlenbeckiaNormanSE) #save this number
+```
+
+73. Myrsine howittiana
+```{r}
+#getting sensitivity metric
+Myrsinehowittianamodel <- Sensitivitymodel(speciesselected = "Myrsine howittiana") 
+Myrsinehowittianasensitivity <- Sensitivitymetric(model = Myrsinehowittianamodel) 
+
+#getting sensitivity SE
+for(j in 1:10000){
+  coeff_rep <- rmvnorm(1, mean = Myrsinehowittianamodel$coefficients, sigma = vcov(Myrsinehowittianamodel))
+  Sensitivity_Metric_rep_parboot[j] <- sqrt(
+    (coeff_rep[2]^2+coeff_rep[3]^2+(coeff_rep[3]-coeff_rep[2])^2)/3)
+}
+MyrsinehowittianaSE <- sd(Sensitivity_Metric_rep_parboot)
+
+#printing the values so I can record them for the spreadsheet! :) 
+print(Myrsinehowittianasensitivity) #save this number
+print(MyrsinehowittianaSE) #save this number
+```
+
+74. Myrsine variabilis
+```{r}
+#getting sensitivity metric
+Myrsinevariabilismodel <- Sensitivitymodel(speciesselected = "Myrsine variabilis") 
+Myrsinevariabilissensitivity <- Sensitivitymetric(model = Myrsinevariabilismodel) 
+
+#getting sensitivity SE
+for(j in 1:10000){
+  coeff_rep <- rmvnorm(1, mean = Myrsinevariabilismodel$coefficients, sigma = vcov(Myrsinevariabilismodel))
+  Sensitivity_Metric_rep_parboot[j] <- sqrt(
+    (coeff_rep[2]^2+coeff_rep[3]^2+(coeff_rep[3]-coeff_rep[2])^2)/3)
+}
+MyrsinevariabilisSE <- sd(Sensitivity_Metric_rep_parboot)
+
+#printing the values so I can record them for the spreadsheet! :) 
+print(Myrsinevariabilissensitivity) #save this number
+print(MyrsinevariabilisSE) #save this number
+```
+
+75. Neolitsea dealbata 
+```{r}
+#getting sensitivity metric
+Neolitseadealbatamodel <- Sensitivitymodel(speciesselected = "Neolitsea dealbata") 
+Neolitseadealbatasensitivity <- Sensitivitymetric(model = Neolitseadealbatamodel) 
+
+#getting sensitivity SE
+for(j in 1:10000){
+  coeff_rep <- rmvnorm(1, mean = Neolitseadealbatamodel$coefficients, sigma = vcov(Neolitseadealbatamodel))
+  Sensitivity_Metric_rep_parboot[j] <- sqrt(
+    (coeff_rep[2]^2+coeff_rep[3]^2+(coeff_rep[3]-coeff_rep[2])^2)/3)
+}
+NeolitseadealbataSE <- sd(Sensitivity_Metric_rep_parboot)
+
+#printing the values so I can record them for the spreadsheet! :) 
+print(Neolitseadealbatasensitivity) #save this number
+print(NeolitseadealbataSE) #save this number
+summary(Neolitseadealbatamodel)
+```
+
+```{r}
+Neolitseadealbata.emmeans <- emmeans(Neolitseadealbatamodel, "Treatment")
+pairs(Neolitseadealbata.emmeans)
+```
+
+76. Oreomyrrhis ciliata
+```{r}
+#getting sensitivity metric
+Oreomyrrhisciliatamodel <- Sensitivitymodel(speciesselected = "Oreomyrrhis ciliata") 
+Oreomyrrhisciliatasensitivity <- Sensitivitymetric(model = Oreomyrrhisciliatamodel) 
+
+#getting sensitivity SE
+for(j in 1:10000){
+  coeff_rep <- rmvnorm(1, mean = Oreomyrrhisciliatamodel$coefficients, sigma = vcov(Oreomyrrhisciliatamodel))
+  Sensitivity_Metric_rep_parboot[j] <- sqrt(
+    (coeff_rep[2]^2+coeff_rep[3]^2+(coeff_rep[3]-coeff_rep[2])^2)/3)
+}
+OreomyrrhisciliataSE <- sd(Sensitivity_Metric_rep_parboot)
+
+#printing the values so I can record them for the spreadsheet! :) 
+print(Oreomyrrhisciliatasensitivity) #save this number
+print(OreomyrrhisciliataSE) #save this number
+summary(Oreomyrrhisciliatamodel)
+```
+
+```{r}
+Oreomyrrhisciliata.emmeans <- emmeans(Oreomyrrhisciliatamodel, "Treatment")
+pairs(Oreomyrrhisciliata.emmeans)
+```
+
+77. Ozothamnus hookeri
+```{r}
+#getting sensitivity metric
+Ozothamnushookerimodel <- Sensitivitymodel(speciesselected = "Ozothamnus hookeri") 
+Ozothamnushookerisensitivity <- Sensitivitymetric(model = Ozothamnushookerimodel) 
+
+#getting sensitivity SE
+for(j in 1:10000){
+  coeff_rep <- rmvnorm(1, mean = Ozothamnushookerimodel$coefficients, sigma = vcov(Ozothamnushookerimodel))
+  Sensitivity_Metric_rep_parboot[j] <- sqrt(
+    (coeff_rep[2]^2+coeff_rep[3]^2+(coeff_rep[3]-coeff_rep[2])^2)/3)
+}
+OzothamnushookeriSE <- sd(Sensitivity_Metric_rep_parboot)
+
+#printing the values so I can record them for the spreadsheet! :) 
+print(Ozothamnushookerisensitivity) #save this number
+print(OzothamnushookeriSE) #save this number
+summary(Ozothamnushookerimodel)
+```
+
+```{r}
+Ozothamnushookeri.emmeans <- emmeans(Ozothamnushookerimodel, "Treatment")
+pairs(Ozothamnushookeri.emmeans)
+```
+
+78. Parsonsia induplicata
+```{r}
+#getting sensitivity metric
+Parsonsiainduplicatamodel <- Sensitivitymodel(speciesselected = "Parsonsia induplicata") 
+Parsonsiainduplicatasensitivity <- Sensitivitymetric(model = Parsonsiainduplicatamodel) 
+
+#getting sensitivity SE
+for(j in 1:10000){
+  coeff_rep <- rmvnorm(1, mean = Parsonsiainduplicatamodel$coefficients, sigma = vcov(Parsonsiainduplicatamodel))
+  Sensitivity_Metric_rep_parboot[j] <- sqrt(
+    (coeff_rep[2]^2+coeff_rep[3]^2+(coeff_rep[3]-coeff_rep[2])^2)/3)
+}
+ParsonsiainduplicataSE <- sd(Sensitivity_Metric_rep_parboot)
+
+#printing the values so I can record them for the spreadsheet! :) 
+print(Parsonsiainduplicatasensitivity) #save this number
+print(ParsonsiainduplicataSE) #save this number
+```
+
+79. Petrophile pulchella
+```{r}
+#getting sensitivity metric
+Petrophilepulchellamodel <- Sensitivitymodel(speciesselected = "Petrophile pulchella") 
+Petrophilepulchellasensitivity <- Sensitivitymetric(model = Petrophilepulchellamodel) 
+
+#getting sensitivity SE
+for(j in 1:10000){
+  coeff_rep <- rmvnorm(1, mean = Petrophilepulchellamodel$coefficients, sigma = vcov(Petrophilepulchellamodel))
+  Sensitivity_Metric_rep_parboot[j] <- sqrt(
+    (coeff_rep[2]^2+coeff_rep[3]^2+(coeff_rep[3]-coeff_rep[2])^2)/3)
+}
+PetrophilepulchellaSE <- sd(Sensitivity_Metric_rep_parboot)
+
+#printing the values so I can record them for the spreadsheet! :) 
+print(Petrophilepulchellasensitivity) #save this number
+print(PetrophilepulchellaSE) #save this number
+summary(Petrophilepulchellamodel)
+```
+
+```{r}
+Petrophilepulchella.emmeans <- emmeans(Petrophilepulchellamodel, "Treatment")
+pairs(Petrophilepulchella.emmeans)
+```
+
+80. Plantago muelleri
+```{r}
+#getting sensitivity metric
+Plantagomuellerimodel <- Sensitivitymodel(speciesselected = "Plantago muelleri") 
+Plantagomuellerisensitivity <- Sensitivitymetric(model = Plantagomuellerimodel) 
+
+#getting sensitivity SE
+for(j in 1:10000){
+  coeff_rep <- rmvnorm(1, mean = Plantagomuellerimodel$coefficients, sigma = vcov(Plantagomuellerimodel))
+  Sensitivity_Metric_rep_parboot[j] <- sqrt(
+    (coeff_rep[2]^2+coeff_rep[3]^2+(coeff_rep[3]-coeff_rep[2])^2)/3)
+}
+PlantagomuelleriSE <- sd(Sensitivity_Metric_rep_parboot)
+
+#printing the values so I can record them for the spreadsheet! :) 
+print(Plantagomuellerisensitivity) #save this number
+print(PlantagomuelleriSE) #save this number
+summary(Plantagomuellerimodel)
+```
+
+```{r}
+Plantagomuelleri.emmeans <- emmeans(Plantagomuellerimodel, "Treatment")
+pairs(Plantagomuelleri.emmeans)
+```
+
+81. Plectranthus parviflorus
+```{r}
+#getting sensitivity metric
+Plectranthusparviflorusmodel <- Sensitivitymodel(speciesselected = "Plectranthus parviflorus") 
+Plectranthusparviflorussensitivity <- Sensitivitymetric(model = Plectranthusparviflorusmodel) 
+
+#getting sensitivity SE
+for(j in 1:10000){
+  coeff_rep <- rmvnorm(1, mean = Plectranthusparviflorusmodel$coefficients, sigma = vcov(Plectranthusparviflorusmodel))
+  Sensitivity_Metric_rep_parboot[j] <- sqrt(
+    (coeff_rep[2]^2+coeff_rep[3]^2+(coeff_rep[3]-coeff_rep[2])^2)/3)
+}
+PlectranthusparviflorusSE <- sd(Sensitivity_Metric_rep_parboot)
+
+#printing the values so I can record them for the spreadsheet! :) 
+print(Plectranthusparviflorussensitivity) #save this number
+print(PlectranthusparviflorusSE) #save this number
+summary(Plectranthusparviflorusmodel)
+```
+
+```{r}
+Plectranthusparviflorus.emmeans <- emmeans(Plectranthusparviflorusmodel, "Treatment")
+pairs(Plectranthusparviflorus.emmeans)
+```
+
+82. Plectranthus suaveolens
+```{r}
+#getting sensitivity metric
+Plectranthussuaveolensmodel <- Sensitivitymodel(speciesselected = "Plectranthus suaveolens") 
+Plectranthussuaveolenssensitivity <- Sensitivitymetric(model = Plectranthussuaveolensmodel) 
+
+#getting sensitivity SE
+for(j in 1:10000){
+  coeff_rep <- rmvnorm(1, mean = Plectranthussuaveolensmodel$coefficients, sigma = vcov(Plectranthussuaveolensmodel))
+  Sensitivity_Metric_rep_parboot[j] <- sqrt(
+    (coeff_rep[2]^2+coeff_rep[3]^2+(coeff_rep[3]-coeff_rep[2])^2)/3)
+}
+PlectranthussuaveolensSE <- sd(Sensitivity_Metric_rep_parboot)
+
+#printing the values so I can record them for the spreadsheet! :) 
+print(Plectranthussuaveolenssensitivity) #save this number
+print(PlectranthussuaveolensSE) #save this number
+summary(Plectranthussuaveolensmodel)
+```
+
+```{r}
+Plectranthussuaveolens.emmeans <- emmeans(Plectranthussuaveolensmodel, "Treatment")
+pairs(Plectranthussuaveolens.emmeans)
+```
+
+83. Pomax umbellata
+```{r}
+#getting sensitivity metric
+Pomaxumbellatamodel <- Sensitivitymodel(speciesselected = "Pomax umbellata") 
+Pomaxumbellatasensitivity <- Sensitivitymetric(model = Pomaxumbellatamodel) 
+
+#getting sensitivity SE
+for(j in 1:10000){
+  coeff_rep <- rmvnorm(1, mean = Pomaxumbellatamodel$coefficients, sigma = vcov(Pomaxumbellatamodel))
+  Sensitivity_Metric_rep_parboot[j] <- sqrt(
+    (coeff_rep[2]^2+coeff_rep[3]^2+(coeff_rep[3]-coeff_rep[2])^2)/3)
+}
+PomaxumbellataSE <- sd(Sensitivity_Metric_rep_parboot)
+
+#printing the values so I can record them for the spreadsheet! :) 
+print(Pomaxumbellatasensitivity) #save this number
+print(PomaxumbellataSE) #save this number
+summary(Pomaxumbellatamodel)
+```
+
+```{r}
+Pomaxumbellata.emmeans <- emmeans(Pomaxumbellatamodel, "Treatment")
+pairs(Pomaxumbellata.emmeans)
+```
+
+84. Rhodanthe anthemoides
+```{r}
+#getting sensitivity metric
+Rhodantheanthemoidesmodel <- Sensitivitymodel(speciesselected = "Rhodanthe anthemoides") 
+Rhodantheanthemoidessensitivity <- Sensitivitymetric(model = Rhodantheanthemoidesmodel) 
+
+#getting sensitivity SE
+for(j in 1:10000){
+  coeff_rep <- rmvnorm(1, mean = Rhodantheanthemoidesmodel$coefficients, sigma = vcov(Rhodantheanthemoidesmodel))
+  Sensitivity_Metric_rep_parboot[j] <- sqrt(
+    (coeff_rep[2]^2+coeff_rep[3]^2+(coeff_rep[3]-coeff_rep[2])^2)/3)
+}
+RhodantheanthemoidesSE <- sd(Sensitivity_Metric_rep_parboot)
+
+#printing the values so I can record them for the spreadsheet! :) 
+print(Rhodantheanthemoidessensitivity) #save this number
+print(RhodantheanthemoidesSE) #save this number
+summary(Rhodantheanthemoidesmodel)
+```
+
+```{r}
+Rhodantheanthemoides.emmeans <- emmeans(Rhodantheanthemoidesmodel, "Treatment")
+pairs(Rhodantheanthemoides.emmeans)
+```
+
+85. Richea continentis
+```{r}
+#getting sensitivity metric
+Richeacontinentismodel <- Sensitivitymodel(speciesselected = "Richea continentis") 
+Richeacontinentissensitivity <- Sensitivitymetric(model = Richeacontinentismodel) 
+
+#getting sensitivity SE
+for(j in 1:10000){
+  coeff_rep <- rmvnorm(1, mean = Richeacontinentismodel$coefficients, sigma = vcov(Richeacontinentismodel))
+  Sensitivity_Metric_rep_parboot[j] <- sqrt(
+    (coeff_rep[2]^2+coeff_rep[3]^2+(coeff_rep[3]-coeff_rep[2])^2)/3)
+}
+RicheacontinentisSE <- sd(Sensitivity_Metric_rep_parboot)
+
+#printing the values so I can record them for the spreadsheet! :) 
+print(Richeacontinentissensitivity) #save this number
+print(RicheacontinentisSE) #save this number
+```
+
+86. Senecio linearifolius var. latifolius
+```{r}
+#getting sensitivity metric
+Seneciolatifoliusmodel <- Sensitivitymodel(speciesselected = "Senecio linearifolius var. latifolius") 
+Seneciolatifoliussensitivity <- Sensitivitymetric(model = Seneciolatifoliusmodel) 
+
+#getting sensitivity SE
+for(j in 1:10000){
+  coeff_rep <- rmvnorm(1, mean = Seneciolatifoliusmodel$coefficients, sigma = vcov(Seneciolatifoliusmodel))
+  Sensitivity_Metric_rep_parboot[j] <- sqrt(
+    (coeff_rep[2]^2+coeff_rep[3]^2+(coeff_rep[3]-coeff_rep[2])^2)/3)
+}
+SeneciolatifoliusSE <- sd(Sensitivity_Metric_rep_parboot)
+
+#printing the values so I can record them for the spreadsheet! :) 
+print(Seneciolatifoliussensitivity) #save this number
+print(SeneciolatifoliusSE) #save this number
+summary(Seneciolatifoliusmodel)
+```
+
+```{r}
+Seneciolatifolius.emmeans <- emmeans(Seneciolatifoliusmodel, "Treatment")
+pairs(Seneciolatifolius.emmeans)
+```
+
+87. Senecio pinnatifolius subsp. alpinus
+```{r}
+#getting sensitivity metric
+Senecioalpinusmodel <- Sensitivitymodel(speciesselected = "Senecio pinnatifolius subsp. alpinus") 
+Senecioalpinussensitivity <- Sensitivitymetric(model = Senecioalpinusmodel) 
+
+#getting sensitivity SE
+for(j in 1:10000){
+  coeff_rep <- rmvnorm(1, mean = Senecioalpinusmodel$coefficients, sigma = vcov(Senecioalpinusmodel))
+  Sensitivity_Metric_rep_parboot[j] <- sqrt(
+    (coeff_rep[2]^2+coeff_rep[3]^2+(coeff_rep[3]-coeff_rep[2])^2)/3)
+}
+SenecioalpinusSE <- sd(Sensitivity_Metric_rep_parboot)
+
+#printing the values so I can record them for the spreadsheet! :) 
+print(Senecioalpinussensitivity) #save this number
+print(SenecioalpinusSE) #save this number
+summary(Senecioalpinusmodel)
+```
+
+```{r}
+Senecioalpinus.emmeans <- emmeans(Senecioalpinusmodel, "Treatment")
+pairs(Senecioalpinus.emmeans)
+```
+
+88. Solanum aviculare 
+```{r}
+#getting sensitivity metric
+Solanumavicularemodel <- Sensitivitymodel(speciesselected = "Solanum aviculare") 
+Solanumavicularesensitivity <- Sensitivitymetric(model = Solanumavicularemodel) 
+
+#getting sensitivity SE
+for(j in 1:10000){
+  coeff_rep <- rmvnorm(1, mean = Solanumavicularemodel$coefficients, sigma = vcov(Solanumavicularemodel))
+  Sensitivity_Metric_rep_parboot[j] <- sqrt(
+    (coeff_rep[2]^2+coeff_rep[3]^2+(coeff_rep[3]-coeff_rep[2])^2)/3)
+}
+SolanumaviculareSE <- sd(Sensitivity_Metric_rep_parboot)
+
+#printing the values so I can record them for the spreadsheet! :) 
+print(Solanumavicularesensitivity) #save this number
+print(SolanumaviculareSE) #save this number
+```
+
+89. Syncarpia glomulifera
+```{r}
+#getting sensitivity metric
+Syncarpiaglomuliferamodel <- Sensitivitymodel(speciesselected = "Syncarpia glomulifera") 
+Syncarpiaglomuliferasensitivity <- Sensitivitymetric(model = Syncarpiaglomuliferamodel) 
+
+#getting sensitivity SE
+for(j in 1:10000){
+  coeff_rep <- rmvnorm(1, mean = Syncarpiaglomuliferamodel$coefficients, sigma = vcov(Syncarpiaglomuliferamodel))
+  Sensitivity_Metric_rep_parboot[j] <- sqrt(
+    (coeff_rep[2]^2+coeff_rep[3]^2+(coeff_rep[3]-coeff_rep[2])^2)/3)
+}
+SyncarpiaglomuliferaSE <- sd(Sensitivity_Metric_rep_parboot)
+
+#printing the values so I can record them for the spreadsheet! :) 
+print(Syncarpiaglomuliferasensitivity) #save this number
+print(SyncarpiaglomuliferaSE) #save this number
+summary(Syncarpiaglomuliferamodel)
+```
+
+```{r}
+Syncarpiaglomulifera.emmeans <- emmeans(Syncarpiaglomuliferamodel, "Treatment")
+pairs(Syncarpiaglomulifera.emmeans)
+```
+
+90. Symplocos wooroonooran
+```{r}
+#getting sensitivity metric
+Symplocoswooroonooranmodel <- Sensitivitymodel(speciesselected = "Symplocos wooroonooran") 
+Symplocoswooroonooransensitivity <- Sensitivitymetric(model = Symplocoswooroonooranmodel) 
+
+#getting sensitivity SE
+for(j in 1:10000){
+  coeff_rep <- rmvnorm(1, mean = Symplocoswooroonooranmodel$coefficients, sigma = vcov(Symplocoswooroonooranmodel))
+  Sensitivity_Metric_rep_parboot[j] <- sqrt(
+    (coeff_rep[2]^2+coeff_rep[3]^2+(coeff_rep[3]-coeff_rep[2])^2)/3)
+}
+SymplocoswooroonooranSE <- sd(Sensitivity_Metric_rep_parboot)
+
+#printing the values so I can record them for the spreadsheet! :) 
+print(Symplocoswooroonooransensitivity) #save this number
+print(SymplocoswooroonooranSE) #save this number
+summary(Symplocoswooroonooranmodel)
+```
+
+```{r}
+Symplocoswooroonooran.emmeans <- emmeans(Symplocoswooroonooranmodel, "Treatment")
+pairs(Symplocoswooroonooran.emmeans)
+```
+
+91. Syzygium crebrinerve
+```{r}
+#getting sensitivity metric
+Syzygiumcrebrinervemodel <- Sensitivitymodel(speciesselected = "Syzygium crebrinerve") 
+Syzygiumcrebrinervesensitivity <- Sensitivitymetric(model = Syzygiumcrebrinervemodel) 
+
+#getting sensitivity SE
+for(j in 1:10000){
+  coeff_rep <- rmvnorm(1, mean = Syzygiumcrebrinervemodel$coefficients, sigma = vcov(Syzygiumcrebrinervemodel))
+  Sensitivity_Metric_rep_parboot[j] <- sqrt(
+    (coeff_rep[2]^2+coeff_rep[3]^2+(coeff_rep[3]-coeff_rep[2])^2)/3)
+}
+SyzygiumcrebrinerveSE <- sd(Sensitivity_Metric_rep_parboot)
+
+#printing the values so I can record them for the spreadsheet! :) 
+print(Syzygiumcrebrinervesensitivity) #save this number
+print(SyzygiumcrebrinerveSE) #save this number
+```
+
+92. Syzygium oleosum.B
+#This species was collected from Border Ranges National Park
+```{r}
+#getting sensitivity metric
+Syzygiumoleosum.Bmodel <- Sensitivitymodel(speciesselected = "Syzygium oleosum.B") 
+Syzygiumoleosum.Bsensitivity <- Sensitivitymetric(model = Syzygiumoleosum.Bmodel) 
+
+#getting sensitivity SE
+for(j in 1:10000){
+  coeff_rep <- rmvnorm(1, mean = Syzygiumoleosum.Bmodel$coefficients, sigma = vcov(Syzygiumoleosum.Bmodel))
+  Sensitivity_Metric_rep_parboot[j] <- sqrt(
+    (coeff_rep[2]^2+coeff_rep[3]^2+(coeff_rep[3]-coeff_rep[2])^2)/3)
+}
+Syzygiumoleosum.BSE <- sd(Sensitivity_Metric_rep_parboot)
+
+#printing the values so I can record them for the spreadsheet! :) 
+print(Syzygiumoleosum.Bsensitivity) #save this number
+print(Syzygiumoleosum.BSE) #save this number
+```
+
+93. Syzygium oleosum.Q
+#This species was collected delivered from Wet Sclerophyll North Queensland
+```{r}
+#getting sensitivity metric
+Syzygiumoleosum.Qmodel <- Sensitivitymodel(speciesselected = "Syzygium oleosum.Q") 
+Syzygiumoleosum.Qsensitivity <- Sensitivitymetric(model = Syzygiumoleosum.Qmodel) 
+
+#getting sensitivity SE
+for(j in 1:10000){
+  coeff_rep <- rmvnorm(1, mean = Syzygiumoleosum.Qmodel$coefficients, sigma = vcov(Syzygiumoleosum.Qmodel))
+  Sensitivity_Metric_rep_parboot[j] <- sqrt(
+    (coeff_rep[2]^2+coeff_rep[3]^2+(coeff_rep[3]-coeff_rep[2])^2)/3)
+}
+Syzygiumoleosum.QSE <- sd(Sensitivity_Metric_rep_parboot)
+
+#printing the values so I can record them for the spreadsheet! :) 
+print(Syzygiumoleosum.Qsensitivity) #save this number
+print(Syzygiumoleosum.QSE) #save this number
+summary(Syzygiumoleosum.Qmodel)
+```
+
+```{r}
+Syzygiumoleosum.Q.emmeans <- emmeans(Syzygiumoleosum.Qmodel, "Treatment")
+pairs(Syzygiumoleosum.Q.emmeans)
+```
+
+94. Syzygium australe
+```{r}
+#getting sensitivity metric
+Syzygiumaustralemodel <- Sensitivitymodel(speciesselected = "Syzygium australe") 
+Syzygiumaustralesensitivity <- Sensitivitymetric(model = Syzygiumaustralemodel) 
+
+#getting sensitivity SE
+for(j in 1:10000){
+  coeff_rep <- rmvnorm(1, mean = Syzygiumaustralemodel$coefficients, sigma = vcov(Syzygiumaustralemodel))
+  Sensitivity_Metric_rep_parboot[j] <- sqrt(
+    (coeff_rep[2]^2+coeff_rep[3]^2+(coeff_rep[3]-coeff_rep[2])^2)/3)
+}
+SyzygiumaustraleSE <- sd(Sensitivity_Metric_rep_parboot)
+
+#printing the values so I can record them for the spreadsheet! :) 
+print(Syzygiumaustralesensitivity) #save this number
+print(SyzygiumaustraleSE) #save this number
+```
+
+95. Tasmannia stipitata
+```{r}
+#getting sensitivity metric
+Tasmanniastipitatamodel <- Sensitivitymodel(speciesselected = "Tasmannia stipitata") 
+Tasmanniastipitatasensitivity <- Sensitivitymetric(model = Tasmanniastipitatamodel) 
+
+#getting sensitivity SE
+for(j in 1:10000){
+  coeff_rep <- rmvnorm(1, mean = Tasmanniastipitatamodel$coefficients, sigma = vcov(Tasmanniastipitatamodel))
+  Sensitivity_Metric_rep_parboot[j] <- sqrt(
+    (coeff_rep[2]^2+coeff_rep[3]^2+(coeff_rep[3]-coeff_rep[2])^2)/3)
+}
+TasmanniastipitataSE <- sd(Sensitivity_Metric_rep_parboot)
+
+#printing the values so I can record them for the spreadsheet! :) 
+print(Tasmanniastipitatasensitivity) #save this number
+print(TasmanniastipitataSE) #save this number
+summary(Tasmanniastipitatamodel)
+```
+
+```{r}
+Tasmanniastipitata.emmeans <- emmeans(Tasmanniastipitatamodel, "Treatment")
+pairs(Tasmanniastipitata.emmeans)
+```
+
+96. Trachymene incisa
+```{r}
+#getting sensitivity metric
+Trachymeneincisamodel <- Sensitivitymodel(speciesselected = "Trachymene incisa") 
+Trachymeneincisasensitivity <- Sensitivitymetric(model = Trachymeneincisamodel) 
+
+#getting sensitivity SE
+for(j in 1:10000){
+  coeff_rep <- rmvnorm(1, mean = Trachymeneincisamodel$coefficients, sigma = vcov(Trachymeneincisamodel))
+  Sensitivity_Metric_rep_parboot[j] <- sqrt(
+    (coeff_rep[2]^2+coeff_rep[3]^2+(coeff_rep[3]-coeff_rep[2])^2)/3)
+}
+TrachymeneincisaSE <- sd(Sensitivity_Metric_rep_parboot)
+
+#printing the values so I can record them for the spreadsheet! :) 
+print(Trachymeneincisasensitivity) #save this number
+print(TrachymeneincisaSE) #save this number
+summary(Trachymeneincisamodel)
+```
+
+```{r}
+Trachymeneincisa.emmeans <- emmeans(Trachymeneincisamodel, "Treatment")
+pairs(Trachymeneincisa.emmeans)
+```
+
+97. Triunia erythrocarpa
+```{r}
+#getting sensitivity metric
+Triuniaerythrocarpamodel <- Sensitivitymodel(speciesselected = "Triunia erythrocarpa") 
+Triuniaerythrocarpasensitivity <- Sensitivitymetric(model = Triuniaerythrocarpamodel) 
+
+#getting sensitivity SE
+for(j in 1:10000){
+  coeff_rep <- rmvnorm(1, mean = Triuniaerythrocarpamodel$coefficients, sigma = vcov(Triuniaerythrocarpamodel))
+  Sensitivity_Metric_rep_parboot[j] <- sqrt(
+    (coeff_rep[2]^2+coeff_rep[3]^2+(coeff_rep[3]-coeff_rep[2])^2)/3)
+}
+TriuniaerythrocarpaSE <- sd(Sensitivity_Metric_rep_parboot)
+
+#printing the values so I can record them for the spreadsheet! :) 
+print(Triuniaerythrocarpasensitivity) #save this number
+print(TriuniaerythrocarpaSE) #save this number
+summary(Triuniaerythrocarpamodel)
+```
+
+```{r}
+Triuniaerythrocarpa.emmeans <- emmeans(Triuniaerythrocarpamodel, "Treatment")
+pairs(Triuniaerythrocarpa.emmeans)
+```
+
+98. Vachellia bidwillii
+```{r}
+#getting sensitivity metric
+Vachelliabidwilliimodel <- Sensitivitymodel(speciesselected = "Vachellia bidwillii") 
+Vachelliabidwilliisensitivity <- Sensitivitymetric(model = Vachelliabidwilliimodel) 
+
+#getting sensitivity SE
+for(j in 1:10000){
+  coeff_rep <- rmvnorm(1, mean = Vachelliabidwilliimodel$coefficients, sigma = vcov(Vachelliabidwilliimodel))
+  Sensitivity_Metric_rep_parboot[j] <- sqrt(
+    (coeff_rep[2]^2+coeff_rep[3]^2+(coeff_rep[3]-coeff_rep[2])^2)/3)
+}
+VachelliabidwilliiSE <- sd(Sensitivity_Metric_rep_parboot)
+
+#printing the values so I can record them for the spreadsheet! :) 
+print(Vachelliabidwilliisensitivity) #save this number
+print(VachelliabidwilliiSE) #save this number
+summary(Vachelliabidwilliimodel)
+```
+
+
+```{r}
+Vachelliabidwillii.emmeans <- emmeans(Vachelliabidwilliimodel, "Treatment")
+pairs(Vachelliabidwillii.emmeans)
+```
+
+#End of code
+
+
+
+
+
+
+

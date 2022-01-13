@@ -1,0 +1,149 @@
+---
+title: "Phylogenetic analysis on Ash's data"
+output: html_document:
+  keep_md:yes
+---
+
+Phylogenetic Analyses to test phylogentic signal in photoperiod sensitivity in germination for the manuscript: Jagdish et al. (In Review) - Shining a light on patterns of photoperiod sensitivty in seed germination across latitudes, ecosystems and functional traits
+
+Step 1: Load libraries required
+```{r}
+library(dplyr)
+library(devtools)
+library(V.PhyloMaker)
+library(ggplot2)
+library(nlme)
+library(phytools)
+library(ggtree)
+```
+
+Step 2: read in data
+- Note for a phylogenetic analysis we need to make sure we have three columns with these exact names - "species", "genus", "family" (being aware of case)
+- species will be a column of things that have the long species name, e.g. Banksia serrata
+- genus will be a column of JUST the genus name, same e.g. Banksia
+- family is the family of the species, same e.g. Proteacea
+
+```{r}
+ashdata <- read.csv("LessThan5Phylo.csv")
+```
+
+Create a data frame with ONLY information about species, genus and family
+
+```{r}
+ashspecieslist <- select(ashdata, "species", "genus", "family")
+```
+
+Getting our tree
+we ran the following code which extracts a tree of JUST OUR species
+- note that GBOTB.extended is the default tree, it is the one created by Smith and Brown, 2018 with updated phylogenies
+- output.sp.list = TRUE will mean that our tree will also spit out a list of what the analysis did to each species along the way, sometimes it bound the species to a tip in the tree, sometimes it prunes the species or sometimes it fails to bind the species to the backbone phylogeny - it is a good idea to check this list, because sometimes the "fail" is because there's a spelling error in the species/genus/family name
+- output.tree = TRUE will allow the analysis to spit out a pretty little tree of our species
+- scenarios is the choice we make about how to deal with species that are new and DON'T occur in the mega-tree. Scenario 3 ("S3"), I BELIEVE personally is the best way to deal with this - see Qian and Jin 2019 and Qian and Jin 2016 for a breakdown of the way each scenario works :)
+
+```{r}
+Phyloanalysis <- phylo.maker(ashspecieslist, tree = GBOTB.extended, output.sp.list = TRUE, output.tree = TRUE, scenarios = "S3")
+
+ashtree <- Phyloanalysis$scenario.3 #creating just your tree (using scenario 3)
+```
+
+Plot that phylogeny to get a pretty tree diagram
+
+```{r}
+ashstree <- ggtree(ashtree,size=0.6) + geom_tiplab(size=3)
+plot(ashstree)
+
+#And save that tree above 
+
+ggsave(filename = "ashtree.tiff", plot = ashstree, width = 12, height = 8, units = "in")
+
+#but I took from phylo.plot tree to match the tip labels
+
+plot.phylo(ashtree, cex = 0.5)
+
+
+```
+
+
+Now running a test for a phylogenetic signal
+
+1. Make sure the branch labels (ie our species) match in the tree AND in our data frame
+
+```{r}
+# add a column with species' names with an underscore in them (because that's what V.phylomaker does to the species labels)
+Species_ <- gsub(" ", "_", ashdata$species)
+ashdata <- cbind(ashdata, Species_)
+
+#make this column the row names 
+rownames(ashdata) <- ashdata[,18]
+```
+
+2. Turn photoperiod into a vector and add the species names to it
+
+```{r}
+PP <- as.vector(ashdata$PP.Sensitivity.Sign)
+names(PP) <- ashdata$Species_
+```
+
+3. Run two analyses- one with lambda method and one with K method
+
+```{r}
+lambda <- phylosig(ashtree, PP, method="lambda", test=TRUE)
+print(lambda)
+
+K <- phylosig(ashtree, PP, method="K", test=TRUE)
+print(K)
+```
+
+BOTH show that there isn't a phylogenetic signal in photoperiod
+
+
+
+Now, Making a graph of your tree with the Photoperiod sensitivity to see if there's a pattern!
+
+There's probably a wayyy easier way to do this but the phytools pacakge seems to be really buggy and I spent ages to no avail, so I'm doing it by hand haha.
+
+Steps:
+1. Make a list of the species names in the ORDER as they appear in your tree (so that our graph will match up with the correct order)
+
+```{r}
+specieslist <- as.data.frame(Phyloanalysis$scenario.3$tip.label) %>%
+  rename(species = `Phyloanalysis$scenario.3$tip.label`)
+
+specieslist$species <- gsub("_", " ", specieslist$species)
+
+```
+
+2. Merge with photoperiod sensitivty data
+
+```{r}
+photoperiod <- left_join(specieslist, ashdata, by = "species")
+```
+
+3. create graph
+
+```{r}
+##lock in order of species
+photoperiod$species <- factor(photoperiod$species, levels = photoperiod$species)
+
+#plot
+PSbyPHYLOplot <- ggplot(photoperiod, aes(x=PP.Sensitivity.Sign, y=species, fill = as.factor(Significance))) + geom_col() +
+  scale_fill_manual(values = c("grey", "lightskyblue")) +
+  theme_classic() +
+  theme(axis.text.y = element_text(face = "italic", hjust = 0)) +
+  theme(axis.text.y=element_text(size=10)) +
+  theme(legend.text = element_blank())
+plot(PSbyPHYLOplot)
+
+#save plot
+
+ggsave(filename = "ashpsplot.tiff", plot =  PSbyPHYLOplot, device = "tiff", dpi = 100, width= 15, height= 25, units = "in")
+```
+
+4. I then stitched this bar plot with the tree in gimp as the species were the same order in both
+
+
+
+
+
+
+

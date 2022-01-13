@@ -5,9 +5,9 @@ output: html_document
 
 Main Analyses for Jagdish et al. (In Review) - Shining a light on patterns of photoperiod sensitivty in seed germination across latitudes, ecosystems and functional traits
 
-- see Rmarkdown "" for gaining a photoperiod sensitivity index for each species using bayesian GLMs
-- see Rmarkdown file "" for Phylogenetic Analyses of photoperiod sensitivity across our species
-- see Rmarkdown file "" for main analysis of germination photoperiod sensitivity and it's relationship with all environmental/ecological predictor variables
+- see Rmarkdown "BayesianPhotoperiodMetricOfficial.Rmd" for gaining a photoperiod sensitivity index for each species using bayesian GLMs
+- see Rmarkdown file "PhylogeneticAnalysis.Rmd" for Phylogenetic Analyses of photoperiod sensitivity across our species
+- see Rmarkdown file "MainAnalyses.Rmd" for main analysis of germination photoperiod sensitivity and it's relationship with all environmental/ecological predictor variables
 
 This code analyses the categorical response variable photoperiod sensitivity - (long day, short day or non-sensitive to photoperiod) logistically regressed against against environmental predictor variables - latitude, Leaf area index, habitat and the ecological variable - seed mass
 
