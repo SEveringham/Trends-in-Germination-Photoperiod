@@ -1,15 +1,19 @@
 ---
 title: "Analysis of flowering photoperiod and predictor variables"
-output: html_document
+author: "Suz Everingham"
+date: "15/1/2022"
+output:
+  html_document: default
+  pdf_document: default
 ---
 
-Main Analyses for Jagdish et al. (In Review) - Shining a light on patterns of photoperiod sensitivty in seed germination across latitudes, ecosystems and functional traits
+Analyses for Jagdish et al. (In Review) - Shining a light on patterns of photoperiod sensitivty in seed germination across latitudes, ecosystems and functional traits
 
-- see Rmarkdown "BayesianPhotoperiodMetricOfficial.Rmd" for gaining a photoperiod sensitivity index for each species using bayesian GLMs
+- see Rmarkdown "BayesianPhotoperiodMetricOfficial.Rmd" for gaining a photoperiod sensitivity index for each species using bayesian GLMs which is used as the response variable throughout all analyses in the file "MainAnalyses.Rmd"
 - see Rmarkdown file "PhylogeneticAnalysis.Rmd" for Phylogenetic Analyses of photoperiod sensitivity across our species
 - see Rmarkdown file "MainAnalyses.Rmd" for main analysis of germination photoperiod sensitivity and it's relationship with all environmental/ecological predictor variables
 
-This code analyses the categorical response variable photoperiod sensitivity - (long day, short day or non-sensitive to photoperiod) logistically regressed against against environmental predictor variables - latitude, Leaf area index, habitat and the ecological variable - seed mass
+This code analyses the categorical response variable flowering photoperiod sensitivity - (long day, short day or non-sensitive to photoperiod) logistically regressed against against environmental predictor variables - latitude, Leaf area index, habitat and the ecological variable - seed mass
 
 Step 1: Install all relevant libraries
 ```{r}

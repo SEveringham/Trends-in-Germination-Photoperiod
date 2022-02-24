@@ -11,6 +11,7 @@ Main Analyses for Jagdish et al. (In Review) - Shining a light on patterns of ph
 
 - see Rmarkdown "BayesianPhotoperiodMetricOfficial.Rmd" for gaining a photoperiod sensitivity index for each species using bayesian GLMs
 - see Rmarkdown file "PhylogeneticAnalysis.Rmd" for Phylogenetic Analyses of photoperiod sensitivity across our species
+- see Rmarkdown "Analysis of flowering photoperiod and predictor variables" for a similar analysis to this current script except instead of germination photoperiod the categorical response variable flowering photoperiod sensitivity - (long day, short day or non-sensitive to photoperiod) logistically regressed against against environmental/ecological predictor variables
 
 This code is a multiple part series, each hypothesis (photoperiod related to each variable) is one part
 
