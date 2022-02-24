@@ -6,11 +6,15 @@ output: html_document
 ---
 Bayesian Photoperiod Sensitivity Metric:
 
-In this segment we will code the Bayesian Photoperiod Sensitivity Metric and standard error for each species.
+In this segment we will code the Bayesian Photoperiod Sensitivity Metric and standard error for each species. This metric will be used in further analyses in the following files:
 
-# RawBinaryGermData.csv is used
-# The 'emmeans' function compares p-values between treatment groups
-# Final main analyses only includes 67 angiosperm species (spanning 42 genera and 26 families), due to insufficient germination across other species 
+- see Rmarkdown file "PhylogeneticAnalysis.Rmd" for Phylogenetic Analyses of photoperiod sensitivity across our species
+- see Rmarkdown file "MainAnalyses.Rmd" for main analysis of germination photoperiod sensitivity and it's relationship with all environmental/ecological predictor variables
+
+Some notes:
+The unedited data from RawBinaryGermData.csv is used for this analysis
+The 'emmeans' function compares p-values between treatment groups
+Final main analyses only includes 67 angiosperm species (spanning 42 genera and 26 families), due to insufficient germination across other species 
 
 Step 1: Read in raw data
 ```{r}
