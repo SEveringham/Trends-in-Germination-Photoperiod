@@ -29,7 +29,7 @@ library(Hmisc)
 ```
 
 
-Step 2: read in data
+Step 2: Read in data
 
 ```{r}
 globalfloweringphotoperiod <- read.csv("photoperiod_global_addition.csv")
@@ -251,5 +251,5 @@ ggsave(ALPINEfloweringphoto,
        height = 7,
        dpi=600)
 ```
-
+End.
 
