@@ -1,0 +1,293 @@
+---
+title: "Dataset_Processing"
+output: html_notebook
+---
+#load in packages and data
+```{r}
+library(tidyverse)
+library(data.table) #recommended package for reading raw TRY data
+
+library(sp) #the older spatial package
+library(sf) #the newer, simpler spatial package
+
+library(ncdf4) #for reading/manipulating Copernicus data
+
+library(raster) #for general raster data
+
+```
+
+
+```{r}
+df <- read.csv("./data/appendix1.csv")
+df <- df %>% filter(df$source_located == "yes")
+```
+
+#Fill in coordinates
+```{r}
+#convert na to zero
+df$lat_d[is.na(df$lat_d)] <- 0
+df$lat_m[is.na(df$lat_m)] <- 0
+df$lat_s[is.na(df$lat_s)] <- 0
+
+df$lon_d[is.na(df$lon_d)] <- 0
+df$lon_m[is.na(df$lon_m)] <- 0
+df$lon_s[is.na(df$lon_s)] <- 0
+
+#create new row of decimal from dms coordinates
+
+df$temp_replace_lat <- (df$lat_d + (df$lat_m)/60 + (df$lat_s)/360)
+df$temp_replace_lon <- (df$lon_d + (df$lon_m)/60 + (df$lon_s)/360)
+
+#when there are no decimal coordinates, replace with converted dms coordinates
+
+df$lat_decimaldegree[is.na(df$lat_decimaldegree)] <- df$temp_replace_lat[is.na(df$lat_decimaldegree)]
+
+df$lon_decimaldegree[is.na(df$lon_decimaldegree)] <- df$temp_replace_lon[is.na(df$lon_decimaldegree)]
+
+#convert S and E to negative coordinates
+
+df$lat_decimaldegree[df$lat_NS == "s"] <- df$lat_decimaldegree[df$lat_NS == "s"]*-1
+
+df$lon_decimaldegree[df$lon_EW == "w"] <- df$lon_decimaldegree[df$lon_EW == "w"]*-1
+
+```
+
+#Seed Mass
+
+Checking the TRY Database: 
+
+Kattge, J, Boenisch, G, Diaz, S, et al. TRY plant trait database - enhanced coverage and open access. Glob Change Biol. 2020; 26: 119-188. https://doi.org/10.1111/gcb.14904
+
+```{r}
+try <- fread("./data/raw/15636_TRY/15636.txt")
+ 
+unique(try$AccSpeciesName) # we just want the seed masses per species
+
+try <- try %>% filter(OriglName == "estimated total seed mass")
+
+```
+This isn't good, we only have 9 species...
+
+Let's check kew first and come back to it.
+
+Checking the Kew Gardens records.
+I manually ctrl-f searched my way through our records since I couldn't find a data portal option.
+
+(Royal Botanic Gardens Kew. (2021) Seed Information Database (SID). Version 7.1. Available from: http://data.kew.org/sid/ (July 2021)) 
+
+TO DO: I also applied a correction based on dry vs wet weight of seeds according to [citation]
+
+
+```{r}
+df <- read.csv( "./data/kew_check.csv")
+
+table(is.na(df$seed_mass))
+```
+Much better, 109 seed mass records!
+
+Now back to TRY to try get more records
+
+```{r}
+df$species[is.na(df$seed_mass) == T] 
+
+unique(try$AccSpeciesName) %in% #compare list of species seed weights available in try
+  df$species[is.na(df$seed_mass) == T] # with list species that are missing
+```
+And they don't overlap, that's ok. we TRY our best.
+
+```{r}
+rm(try)
+```
+
+#Alpine (unused, see end of section for context)
+
+Alpine shapefile obtained from: Testolin, Riccardo; Attorre, Fabio; Jiménez-Alfaro, Borja (2020): Global distribution and bioclimatic characterization of alpine biomes. figshare. Dataset. https://doi.org/10.6084/m9.figshare.11710002.v1  
+
+Note that google uses EPSG:3857 while normal  WGS84 is EPSG:4326.
+The transformation between google and normal caused worse issues than untransformed (maybe since the google one is ill defined?), and they are around the same anyways so I decided to assume they are the same. Sorry. 
+```{r}
+
+df$coordinates <- df[,5:6] %>%  #Turn latitude and longitude into coordinates
+  as.data.frame %>% 
+  st_as_sf(coords = c(2,1)) %>%
+  st_set_crs("EPSG:4326")
+
+
+plot(df$coordinates)
+
+```
+
+#clean up alpine polygons
+(v slow)
+```{r}
+alpine <- st_read(dsn = "./data/alpine_clusters", layer = "alpine_clusters")
+
+
+any(is.na(st_dimension(alpine)))#at least there are no empty geometries, 
+any(is.na(st_is_valid(alpine))) #or corrupt geometries
+any(na.omit(st_is_valid(alpine)) == FALSE) #but there are invalid ones
+
+#table(st_is_valid(alpine, reason = T)) #for a single polygon, edge 0 crosses edge 3 in 
+
+st_intersects(df$coordinates[1, ], alpine, sparse = F) #the problem is in object 36955
+alpine$ecoregion[36955] # in the "Hengduan Mountains Subalpine Conifer Forests"
+
+alpine <- st_make_valid(alpine) %>% st_cast("MULTIPOLYGON") #make the loops valid, this takes a long time
+
+st_intersects(df$coordinates[1, ], alpine, sparse = F) #there is still a problem
+
+plot(alpine$geometry[36955]) #the shape intersects itself
+
+alpine$geometry[[36955]][[1]][[1]] #look at the individual points
+
+#if we move point 4 sliiiightly down by 0.1 degree, there will no longer be an overlap
+#and it will be fixed
+
+alpine$geometry[[36955]][[1]][[1]][[4,2]] <- 32.20227
+
+table(st_is_valid(alpine, reason = T)) #everything is valid!
+
+plot(alpine) #plot
+```
+
+#Check for intersection between alpine zones and our coordinates
+```{r}
+intersection <- st_intersects(df$coordinates, alpine$geometry, sparse = FALSE) #very slow
+
+alpine_records <- which(intersection, arr.ind = T) #which row (df row) and column (alpine polygon) is intersecting?
+
+alpine_records
+
+df[67 ,] #have a look at what the intersecting alpine regions and the records were
+alpine$ecoregion[[29318]]
+df[50 ,]
+alpine$ecoregion[[38661]]
+df[68 ,]
+alpine$ecoregion[[46203]]
+
+df$alpine <- "0"
+df$alpine[67] <- "1"  #Add info to df
+df$alpine[50] <- "1" 
+df$alpine[68] <- "1"
+
+rm(alpine, intersection)#remove the extra info
+```
+Just out of interest, I pulled the ecoregions of the alpine points.
+
+50: Mt Slattajaka
+in the "Scandinavian Montane Birch Forest And Grasslands"
+
+67:Col du Lautaret, Hautes Alps de Provence, France
+in the "Alps Conifer And Mixed Forests"
+
+68: Finse, Hardangervidda, Ulvik, Norway
+in the "Scandinavian Montane Birch Forest And Grasslands"
+Very cool.
+
+
+This is very few points. 
+
+Some locations known to be alpine were also not detected, and alpine status of source populations were difficult to resolve. 
+
+Eg. Some mimulus guttatas populations identified as alpine populations in original source existed below treeline, but also could extend above treeline. 
+
+Because of difficulties in determining whether a source could be considered an alpine population, we decided it was best to put aside this analysis.
+
+```{r}
+# df <- read.csv("./data/alpine_check.csv") #Unused option for a manual check of alpine records
+```
+
+#LAI
+
+We obtained NDVI from copernicus.
+
+```{r}
+nc <- nc_open("./data/copernicus_ndvi_1km_5y/c_gls_NDVI-STS_2015-2019-0611_GLOBE_PROBAV_V3.0.1.nc")
+
+names(nc$var) #names of the variables to choose from
+
+ndvi_raster<- raster("./data/copernicus_ndvi_1km_5y/c_gls_NDVI-STS_2015-2019-0611_GLOBE_PROBAV_V3.0.1.nc", varname = "median") #choose the median
+
+```
+
+Since most of the plants on the list seem to be herbaceous grassland species, I have decided to use a conversion equation made using grassland data: Fan, L., Gao, Y., Brück, H. et al. Investigating the relationship between NDVI and LAI in semi-arid grassland in Inner Mongolia using in-situ measurements. Theor Appl Climatol 95, 151–156 (2009). https://doi.org/10.1007/s00704-007-0369-2
+LAI = 0.128 * exp(NDVI/0.311)
+```{r}
+df$NDVI <- raster::extract(ndvi_raster, df$coordinates, method = "simple")
+df$LAI <- 0.128 * exp(df$NDVI/0.311)
+```
+
+#Create minimum temperature raster from worldclim (unused in paper)
+
+Fick, S.E. and R.J. Hijmans, 2017. WorldClim 2: new 1km spatial resolution climate surfaces for global land areas. International Journal of Climatology 37 (12): 4302-4315.
+
+```{r}
+mintemp_raster_1 <- raster("./data/wc2.1_10m_tmin/wc2.1_10m_tmin_01.tif")
+mintemp_raster_2 <- raster("./data/wc2.1_10m_tmin/wc2.1_10m_tmin_02.tif")
+mintemp_raster_3 <- raster("./data/wc2.1_10m_tmin/wc2.1_10m_tmin_03.tif")
+mintemp_raster_4 <- raster("./data/wc2.1_10m_tmin/wc2.1_10m_tmin_04.tif")
+mintemp_raster_5 <- raster("./data/wc2.1_10m_tmin/wc2.1_10m_tmin_05.tif")
+mintemp_raster_6 <- raster("./data/wc2.1_10m_tmin/wc2.1_10m_tmin_06.tif")
+mintemp_raster_7 <- raster("./data/wc2.1_10m_tmin/wc2.1_10m_tmin_07.tif")
+mintemp_raster_8 <- raster("./data/wc2.1_10m_tmin/wc2.1_10m_tmin_08.tif")
+mintemp_raster_9 <- raster("./data/wc2.1_10m_tmin/wc2.1_10m_tmin_09.tif")
+mintemp_raster_10 <- raster("./data/wc2.1_10m_tmin/wc2.1_10m_tmin_10.tif")
+mintemp_raster_11 <- raster("./data/wc2.1_10m_tmin/wc2.1_10m_tmin_11.tif")
+mintemp_raster_12 <- raster("./data/wc2.1_10m_tmin/wc2.1_10m_tmin_12.tif")
+
+
+mintemp_raster_all <- overlay(mintemp_raster_1, mintemp_raster_2, mintemp_raster_3, mintemp_raster_4, mintemp_raster_5, mintemp_raster_6, mintemp_raster_7, mintemp_raster_8, mintemp_raster_9, mintemp_raster_10, mintemp_raster_11, mintemp_raster_12, fun = min)
+
+plot(mintemp_raster_all)
+```
+#find minimum temperature for all coordinates
+```{r}
+df$temp_min <- raster::extract(mintemp_raster_all, df$coordinates, method = "simple")
+```
+
+#create a clean final dataset from df
+```{r}
+df_output <- transmute(df, species = species, photoperiodism = photoperiodism, source_name = source_name, lat = lat_decimaldegree, lon = lon_decimaldegree, year = year, LAI = LAI, min_temp = temp_min, seed_mass = seed_mass, alpine = alpine, elevation = elevation, cultivar = cultivar, reference = reference, notes = notes)
+
+write.csv(df_output, "./output/photoperiod_global_addition.csv", row.names = FALSE)
+```
+
+#clear up environment
+```{r}
+rm(mintemp_raster_1, mintemp_raster_2, mintemp_raster_3, mintemp_raster_4, mintemp_raster_5, mintemp_raster_6, mintemp_raster_7, mintemp_raster_8, mintemp_raster_9, mintemp_raster_10, mintemp_raster_11, mintemp_raster_12, nc, ndvi_raster, alpine_records, mintemp_raster_all)
+```
+
+## Match family using rGBIF
+```{r}
+library(rgbif)
+```
+
+Check environment (you will need a freely available GBIF login to run)
+```{r}
+usethis::edit_r_environ() #edit environment to include gbif login details in a way that saves it locally on the computer running the code (you don't get my login details sorry)
+```
+
+round latlon
+```{r}
+df_output$lat <- round(df_output$lat, digits = 2)
+df_output$lon <- round(df_output$lon, digits = 2)
+```
+
+
+Fix up reading errors
+```{r}
+df_output$species <- gsub(pattern = "<a0>", replacement = " ", df_output$species)
+```
+
+Check for matching taxon in GBIF to obtain family, print out to check that the families make sense
+```{r}
+gbif_taxon_check <- name_backbone_checklist(df_output$species)
+
+gbif_taxon_check
+```
+Append family info onto output and save over previous csv
+```{r}
+df_output$family <- gbif_taxon_check$family
+write.csv(df_output, "./output/photoperiod_global_addition.csv", row.names = FALSE)
+```
+
