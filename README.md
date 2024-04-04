@@ -1,8 +1,8 @@
 # Trends-in-Germination-Photoperiod
 
-This repository is for the analyses performed in the manuscript Jagdish et al. (In Review) - Shining a light on patterns of photoperiod sensitivty in seed germination across latitudes, ecosystems and functional traits
+This repository is for the analyses performed in the manuscript Perrin, Moles, Offord, Slavich and Everingham (In Review) - SShining a light on patterns of photoperiod sensitivity in germination and flowering across latitudes, ecosystems and functional traits
 
-There are four rmarkdown files:
+There are four Rmarkdown files:
 
 - see Rmarkdown "BayesianPhotoperiodMetricOfficial.Rmd" for gaining a photoperiod sensitivity index for each species using bayesian GLMs
 - see Rmarkdown file "PhylogeneticAnalysis.Rmd" for Phylogenetic Analyses of photoperiod sensitivity across our species
