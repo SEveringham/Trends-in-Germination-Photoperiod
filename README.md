@@ -1,6 +1,6 @@
 # Trends-in-Germination-Photoperiod
 
-This repository is for the analyses performed in the manuscript Perrin, Moles, Offord, Slavich and Everingham (In Review) - Shining a light on patterns of photoperiod sensitivity in germination and flowering across latitudes, ecosystems and functional traits
+This repository is for the analyses performed in the manuscript Perrin, Moles, Offord, Slavich, Zeng and Everingham (In Review) - Shining a light on patterns of photoperiod sensitivity in germination and flowering across latitudes, ecosystems and functional traits
 
 There are four Rmarkdown files:
 
