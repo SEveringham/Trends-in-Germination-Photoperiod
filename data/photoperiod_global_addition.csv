@@ -1,0 +1,146 @@
+species,family,photoperiodism,source_name,lat,lon,year,LAI,min_temp,seed_mass,alpine,elevation,cultivar,reference,notes,order
+Panicum virgatum,Poaceae,sd,"Dacotah at Brookings, SD (44° N, 97° W)",44.309923,-96.77524,NA,0.540527078,-17.20700073,1.3,0,,,castro et al 2011,"Coords for dakota street, Brookings. Could not find pierre locations",1
+Agrostis alba,Poaceae,sd,"Eichhof, Germany",53.6335,13.8511,NA,0.858826774,-2.753499985,0.08,0,,,cooper and calder 1964,,1
+Agrostis canina,Poaceae,sd,"Mommersteeg, Netherlands",51.7043,5.2097,NA,0.599106048,-0.048750002,0.06,0,,,cooper and calder 1964,,1
+Agrostis tenuis,Poaceae,na,"Taliesin, Cardiganshire",52.5038,-3.9788,NA,1.47403699,1.155498743,0.07,0,,,cooper and calder 1964,,1
+Aira praecox,Poaceae,na,"Freshwater East, Pembrokeshire",51.6494,-4.8652,NA,1.400119994,3.839130402,0.16,0,,,cooper and calder 1964,,1
+Alopecurus myosuroides,Poaceae,sd,"Cambridge, England",52.2053,0.1218,NA,0.583891485,0.919250011,1.9948,0,,,cooper and calder 1964,Alopecurus agrestis,1
+Brachypodium pinnatum,Poaceae,na,"Box Hill, Surrey",51.2548,-0.3086,NA,1.633783971,1.094750047,3.7,0,,,cooper and calder 1964,,1
+Brachypodium sylvaticum,Poaceae,na,"Box Hill, Surrey",51.2548,-0.3086,NA,1.633783971,1.094750047,3.56,0,,,cooper and calder 1964,,1
+Briza media,Poaceae,na,"Box Hill, Surrey",51.2548,-0.3086,NA,1.633783971,1.094750047,0.5,0,,,cooper and calder 1964,,1
+Bromus erectus,Poaceae,sd,"Box Hill, Surrey",51.2548,-0.3086,NA,1.633783971,1.094750047,4.55,0,,,cooper and calder 1964,,1
+Bromus secalinus,Poaceae,na,"Bernberg, Germany",51.7802,11.7539,NA,0.583891485,-2.04550004,8.41,0,,,cooper and calder 1964,,1
+Festuca gigantea,Poaceae,na,"Box Hill, Surrey",51.2548,-0.3086,NA,1.633783971,1.094750047,1.048,0,,,cooper and calder 1964,,1
+Festuca ovina,Poaceae,na,"Lizard, Cornwall",49.9682,-5.2042,NA,1.041579184,4.535135269,0.6,0,,,cooper and calder 1964,,1
+Festuca ovina,Poaceae,na,"Nant-yr-arian, Cardiganshire",52.4315,-3.889,NA,0.95190109,0.961250007,0.6,0,,,cooper and calder 1964,,1
+Holcus lanatus,Poaceae,na,"Warrington, Lancashire",53.3899,-2.5969,NA,0.276921603,1.394250035,0.3,0,,,cooper and calder 1964,,1
+Phalaris aquatica,Poaceae,na,"Frodsley, Tasmania",-41.5954,148.0421,NA,0.630734851,1.633999944,1.71,0,,,cooper and calder 1964,"Frodsley assumed to be Frodsley Road in Tasmania, or nearby rural property named frodsley",1
+Mimulus guttatus,Phrymaceae,na,CCC,38.01944444,-120.7527778,NA,0.327319585,1.69175005,0.03,0,270.36,,friedman and willis 2013,,3
+Mimulus guttatus,Phrymaceae,na,CCG,45.77222222,-121.2833333,NA,1.02826845,-3.155750036,0.03,0,30.48,,friedman and willis 2013,,3
+Mimulus guttatus,Phrymaceae,ld,COL,40.13888889,-121.5083333,NA,1.125141072,-2.819499969,0.03,0,1524,,friedman and willis 2013,,3
+Mimulus guttatus,Phrymaceae,ld,CSS,38.98333333,-122.5527778,NA,0.487675801,0.581250012,0.03,0,637.95,,friedman and willis 2013,,3
+Mimulus guttatus,Phrymaceae,ld,HCG,42.64722222,-123.525,NA,1.787701888,0.750750005,0.03,0,243.84,,friedman and willis 2013,,3
+Mimulus guttatus,Phrymaceae,na,HNT,38.19166667,-121.2111111,NA,0.533619478,2.298500061,0.03,0,504.14,,friedman and willis 2013,,3
+Mimulus guttatus,Phrymaceae,ld,IM,44.40833333,-122.2916667,NA,1.834284351,-2.016249895,0.03,1,1432.53,,friedman and willis 2013,,3
+Mimulus guttatus,Phrymaceae,na,LMC,38.98888889,-123.0888889,NA,0.439992179,2.065749884,0.03,0,306.02,,friedman and willis 2013,,3
+Mimulus guttatus,Phrymaceae,na,MCC,38.55277778,-120.8694444,NA,0.451457133,2.001499891,0.03,0,304.8,,friedman and willis 2013,,3
+Mimulus guttatus,Phrymaceae,na,MCN,38.1,-120.8388889,NA,0.428818383,2.18475008,0.03,0,256.03,,friedman and willis 2013,,3
+Mimulus guttatus,Phrymaceae,ld,MED,37.94722222,-120.4166667,NA,0.493988669,0.809000015,0.03,0,304.8,,friedman and willis 2013,,3
+Mimulus guttatus,Phrymaceae,na,OBR,39.26944444,-123.2416667,NA,0.745524608,1.53974998,0.03,0,91.44,,friedman and willis 2013,,3
+Mimulus guttatus,Phrymaceae,ld,PTH,38.03611111,-119.9944444,NA,0.858826774,-5.962250233,0.03,1,1414.88,,friedman and willis 2013,,3
+Mimulus guttatus,Phrymaceae,ld,RGR,42.54166667,-124.2833333,NA,1.612905229,2.911250114,0.03,0,82.29,,friedman and willis 2013,,3
+Mimulus guttatus,Phrymaceae,ld,RH,38.925,-122.5833333,NA,0.51342183,0.581250012,0.03,0,687.93,,friedman and willis 2013,,3
+Mimulus guttatus,Phrymaceae,ld,SAM,46.04166667,-123.7111111,NA,1.55185631,1.647959232,0.03,0,556.87,,friedman and willis 2013,,3
+Mimulus guttatus,Phrymaceae,ld,SBG,45.46944444,-121.1527778,NA,0.299137957,-3.742249966,0.03,0,238.96,,friedman and willis 2013,,3
+Mimulus guttatus,Phrymaceae,na,SKZ,49.03333333,-124.0027778,NA,1.532024552,-1.139000058,0.03,0,116.43,,friedman and willis 2013,,3
+Mimulus guttatus,Phrymaceae,ld,SLP,38.55277778,-120.8694444,NA,0.451457133,2.001499891,0.03,0,304.8,,friedman and willis 2013,,3
+Mimulus guttatus,Phrymaceae,ld,WKR,20.73888889,-121.2583333,NA,2.595868875,NA,0.03,1,1868.42,,friedman and willis 2013,,3
+Mimulus guttatus,Phrymaceae,ld,ALA,58.07222222,-135.8861111,NA,1.041579184,-5.424250126,0.03,0,18.89,,friedman and willis 2013,,3
+Mimulus guttatus,Phrymaceae,ld,BCB,36.22777778,-121.6694444,NA,1.015127819,3.558609247,0.03,0,4.57,,friedman and willis 2013,,3
+Mimulus guttatus,Phrymaceae,ld,BOG,41.98611111,-118.8583333,NA,0.237316242,-6.368750095,0.03,1,1307.9,,friedman and willis 2013,,3
+Mimulus guttatus,Phrymaceae,ld,BOB,48.63333333,-124.4583333,NA,1.154459072,-0.219444439,0.03,0,7.62,,friedman and willis 2013,,3
+Mimulus guttatus,Phrymaceae,ld,CH,40.125,-121.5,NA,1.184541015,-5.287499905,0.03,1,1371.6,,friedman and willis 2013,,3
+Mimulus guttatus,Phrymaceae,ld,DUN,43.98055556,-124.1777778,NA,2.595868875,NA,0.03,0,7.62,,friedman and willis 2013,,3
+Mimulus guttatus,Phrymaceae,ld,IMP,44.40833333,-122.1555556,NA,1.698055866,-3.869250059,0.03,0,1573.38,,friedman and willis 2013,,3
+Mimulus guttatus,Phrymaceae,ld,OPB,42.58888889,-124.4777778,NA,2.595868875,3.964285612,0.03,0,7.62,,friedman and willis 2013,,3
+Mimulus guttatus,Phrymaceae,ld,OSW,45.85277778,-124.1055556,NA,2.595868875,NA,0.03,0,4.57,,friedman and willis 2013,,3
+Mimulus guttatus,Phrymaceae,ld,SWB,37.05833333,-123.7527778,NA,2.595868875,NA,0.03,0,4.57,,friedman and willis 2013,,3
+Mimulus guttatus,Phrymaceae,ld,TSG,53.43611111,-132.0555556,NA,1.21540681,0.065750003,0.03,0,4.57,,friedman and willis 2013,,3
+Mimulus guttatus,Phrymaceae,ld,WKQ,40.71666667,-121.1166667,NA,0.869944118,-7.443500042,0.03,1,1902.26,,friedman and willis 2013,,1
+Spergularia diandra,Carophyllaceae,ld,near Sede Boker,30.8753,34.7929,NA,0.198210441,5.328000069,0.032,0,,,gutterman 1997,,1
+Phippsia algida,Poaceae,ld,Mt Slattajaka,68.35,18.7,1989,0.253079151,-15.62174988,NA,1,1020,,heide 1992,"There are multiple heide 1992 papers, this one is https://doi.org/10.1111/j.1399-3054.1992.tb04761.x",1
+Carex canescens,Cyperaceae,na,"As, Norway",59.66666667,10.83333333,NA,1.882080622,-6.374931335,0.357,0,100,,heide 2002,,3
+Carex canescens,Cyperaceae,sd,"Rondane, Ringebu, Norway",60.66666667,10.08333333,NA,1.364563327,-10.41499996,0.357,1,1050,,heide 2002,,1
+Carex canescens,Cyperaceae,sd,"Mt Kosciusko, Snowy Mts, Australia",-36.5,148.5,NA,0.64717002,-0.986750007,0.357,1,2150,,heide 2002,,3
+Carex canescens,Cyperaceae,sd,"Mt Twynam, Snowy Mts, Australia",-36.66666667,148.6666667,NA,0.774853013,0.685000002,0.357,1,1980,,heide 2002,,3
+Carex canescens,Cyperaceae,sd,"Coihaique, Chile",-44.66666667,-71.66666667,NA,0.310905831,-4.513249874,0.357,0,850,,heide 2002,"potentially alpine, not picked up by raster but not many trees and high elevation",3
+Carex echinata,Cyperaceae,na,"Grytoy, Harstad, Norway",68.83333333,16.5,NA,2.595868875,-5.699459553,0.81,0,80,,heide 2002,,3
+Carex echinata,Cyperaceae,sd,"Frawna, Norway",62.83333333,7.166666667,NA,2.595868875,-2.951388836,0.81,0,50,,heide 2002,no flowering under low temps,1
+Carex echinata,Cyperaceae,sd,"Moss, Norway",59.41666667,10.66666667,NA,0.599106048,-6.162820339,0.81,0,80,,heide 2002,no flowering under low temps,3
+Carex echinata,Cyperaceae,sd,"River Snowy Mts, Australia",-36.5,148.3333333,NA,1.312914219,-2.351500034,0.81,1,1930,,heide 2002,no flowering under low temps,3
+Carex echinata,Cyperaceae,sd,"Mt Twynam, Snowy Mts, Australia",-36.66666667,148.6666667,NA,0.774853013,0.685000002,0.81,1,1950,,heide 2002,no flowering under low temps,3
+Carex echinata,Cyperaceae,sd,"Betts Creek, Snowy Mts, Australia",-36.58333333,148.8333333,NA,0.576429715,-1.326500058,0.81,1,1730,,heide 2002,no flowering under low temps,3
+Carex lachenalii,Cyperaceae,na,"Grytoy, Harstad, Norway",68.83333333,16.33333333,NA,1.015127819,-6.4617486,0.3352,0,800,,heide 2002,,3
+Carex lachenalii,Cyperaceae,sd,"Beiarn, Norway",67,14.91666667,NA,0.372245797,-10.24825001,0.3352,0,600,,heide 2002,na under low temperatures,1
+Carex lachenalii,Cyperaceae,sd,"Otago, New Zealand",45.16666667,169.8333333,NA,2.595868875,NA,0.3352,0,1420,,heide 2002,Something is wrong with these coordinates,3
+Carex magellanica,Cyperaceae,sd,"Kongsvinger, Norway",60.08333333,12.08333333,NA,1.47403699,-9.052499771,1.5,0,280,,heide 2002,na under low temperatures,3
+Carex magellanica,Cyperaceae,sd,"Punta Arenas, Chile",-63.08333333,-71.16666667,NA,NA,NA,1.5,0,100,,heide 2002,na under low temperatures,3
+Oxyria digyna,Polygonaceae,sld,"Col du Lautaret, Hautes Alps de Provence, France",45.08333333,6.416666667,NA,0.475291058,-9.300499916,0.78,1,2200,,heide 2005,,1
+Oxyria digyna,Polygonaceae,sld,"Finse, Hardangervidda, Ulvik, Norway",60.58333333,7.5,NA,0.115484506,-13.42525005,0.78,1,1300,,heide 2005,,3
+Oxyria digyna,Polygonaceae,sld,"Grytoy, Harstad, Norway",68.83333333,16.33333333,NA,1.015127819,-6.4617486,0.78,0,430,,heide 2005,,3
+Oxyria digyna,Polygonaceae,sld,"Longearbyen, Svalbard",78.16666667,15.5,NA,NA,-18.38768387,0.78,0,20,,heide 2005,,3
+Koenigia islandica,Polygonaceae,ld,"kongsvoll in the dovre mountains, oppdal, south norway",62.3,9.6,NA,0.599106048,-10.86800003,NA,1,900,,heide and gauslaa 1999,"arctic, results similar to alpine",1
+Androsace alpina,Primulaceae,ld,"Mount Schrankogel, Tyrol",47.14722222,11.24444444,1999,0.41792835,-9.219750404,NA,1,between 2600 and 3200,,keller and korner 2003,,1
+Carex curvula,Cyperaceae,na,"Mount Schrankogel, Tyrol",47.14722222,11.24444444,1999,0.41792835,-9.219750404,2,1,between 2600 and 3200,,keller and korner 2003,,1
+Cerastium uniflorum ,Caryophyllaceae,na,"Mount Schrankogel, Tyrol",47.14722222,11.24444444,1999,0.41792835,-9.219750404,0.2556,1,between 2600 and 3200,,keller and korner 2003,,1
+Elyna myosuroides,Cyperaceae,na,"Mount Schrankogel, Tyrol",47.14722222,11.24444444,1999,0.41792835,-9.219750404,NA,1,between 2600 and 3200,,keller and korner 2003,,1
+Erigeron uniflorus,Poaceae,yes,"Mount Schrankogel, Tyrol",47.14722222,11.24444444,1999,0.41792835,-9.219750404,0.16,1,between 2600 and 3200,,keller and korner 2003,,1
+Festuca af. intercedens,Poaceae,ld,"Mount Schrankogel, Tyrol",47.14722222,11.24444444,1999,0.41792835,-9.219750404,NA,1,between 2600 and 3200,,keller and korner 2003,,1
+Gentiana bavarica,Gentianaceae,na,"Mount Schrankogel, Tyrol",47.14722222,11.24444444,1999,0.41792835,-9.219750404,NA,1,between 2600 and 3200,,keller and korner 2003,,1
+Geum reptans,Rosaceae,na,"Mount Schrankogel, Tyrol",47.14722222,11.24444444,1999,0.41792835,-9.219750404,1.0833333,1,between 2600 and 3200,,keller and korner 2003,,1
+Gnaphalium supinum,Asteraceae,ld,"Mount Schrankogel, Tyrol",47.14722222,11.24444444,1999,0.41792835,-9.219750404,0.0928,1,between 2600 and 3200,,keller and korner 2003,,1
+Leucanthemopsis alpina,Asteraceae,ld,"Mount Schrankogel, Tyrol",47.14722222,11.24444444,1999,0.41792835,-9.219750404,0.3801,1,between 2600 and 3200,,keller and korner 2003,,1
+Linaria alpina,Plantaginaceae,ld,"Mount Schrankogel, Tyrol",47.14722222,11.24444444,1999,0.41792835,-9.219750404,0.329,1,between 2600 and 3200,,keller and korner 2003,,1
+Luzula spicata,Juncaceae,ld,"Mount Schrankogel, Tyrol",47.14722222,11.24444444,1999,0.41792835,-9.219750404,0.27,1,between 2600 and 3200,,keller and korner 2003,,1
+Minuartia sedoides,Caryophyllaceae,na,"Mount Schrankogel, Tyrol",47.14722222,11.24444444,1999,0.41792835,-9.219750404,NA,1,between 2600 and 3200,,keller and korner 2003,,1
+Oxyria digyna,Polygonaceae,ld,"Mount Schrankogel, Tyrol",47.14722222,11.24444444,1999,0.41792835,-9.219750404,0.78,1,between 2600 and 3200,,keller and korner 2003,,1
+Poa laxa,Poaceae,ld,"Mount Schrankogel, Tyrol",47.14722222,11.24444444,1999,0.41792835,-9.219750404,0.3588,1,between 2600 and 3200,,keller and korner 2003,,1
+Potentilla frigida,Rosaceae,yes,"Mount Schrankogel, Tyrol",47.14722222,11.24444444,1999,0.41792835,-9.219750404,NA,1,between 2600 and 3200,,keller and korner 2003,,1
+Ranunculus glacialis,Ranunculaceae,na,"Mount Schrankogel, Tyrol",47.14722222,11.24444444,1999,0.41792835,-9.219750404,0.5078,1,between 2600 and 3200,,keller and korner 2003,,1
+Saxifraga bryoides,Saxifragaceae,ld,"Mount Schrankogel, Tyrol",47.14722222,11.24444444,1999,0.41792835,-9.219750404,0.0442,1,between 2600 and 3200,,keller and korner 2003,,1
+Saxifraga oppositifolia,Saxifragaceae,na,"Mount Schrankogel, Tyrol",47.14722222,11.24444444,1999,0.41792835,-9.219750404,0.11,1,between 2600 and 3200,,keller and korner 2003,,1
+Saxifraga seguieri,Saxifragaceae,na,"Mount Schrankogel, Tyrol",47.14722222,11.24444444,1999,0.41792835,-9.219750404,0.04,1,between 2600 and 3200,,keller and korner 2003,,1
+Sedum alpestre,Crassulaceae,ld,"Mount Schrankogel, Tyrol",47.14722222,11.24444444,1999,0.41792835,-9.219750404,0.041,1,between 2600 and 3200,,keller and korner 2003,,1
+Sibbaldia procumbens,Rosaceae,yes,"Mount Schrankogel, Tyrol",47.14722222,11.24444444,1999,0.41792835,-9.219750404,0.4,1,between 2600 and 3200,,keller and korner 2003,,1
+Mimulus alsinoides,Phrymaceae,ld,Central Cascade Mountains,44.1423,-122.5785,NA,1.676355768,-0.183249995,NA,0,,,kooyers et al 2017,"potentially alpine, not picked up by raster",1
+Pycnosorus thompsonianus,Asteraceae,ld,Wallen Station,-28.15777778,148.2316667,2003,0.381945471,4.488999844,NA,0,,,krisantini et al 2015,,1
+Rhodanthe floribunda,Asteraceae,ld,Wallen Station,-28.15777778,148.2316667,2003,0.381945471,4.488999844,0.39,0,,,krisantini et al 2015,,1
+Microstegium vimineum,Poaceae,sd,"hopkins, south carolina",33.8778,-81.0028,NA,1.698055866,0.896000028,0.761,0,,,novy et al 2013,seed mass from cheplick 2005,1
+Microstegium vimineum,Poaceae,sd,"chapel hill, north carolina",35.95,-79.1556,NA,1.720036866,-2.006749868,0.761,0,,,novy et al 2013,seed mass from cheplick 2005,3
+Microstegium vimineum,Poaceae,sd,"fort belvoir, virginia",38.7611,-77.1833,NA,0.755175278,-3.926566362,0.761,0,,,novy et al 2013,seed mass from cheplick 2005,3
+Microstegium vimineum,Poaceae,sd,"whittman, maryland",38.9028,-76.3944,NA,2.595868875,-3.361290216,0.761,0,,,novy et al 2013,seed mass from cheplick 2005,3
+Microstegium vimineum,Poaceae,sd,"great falls, virginia",39.0722,-77.3889,NA,1.329909637,-4.785250187,0.761,0,,,novy et al 2013,seed mass from cheplick 2005,3
+Microstegium vimineum,Poaceae,sd,"delaware city, delaware",39.6278,-75.7056,NA,1.382227332,-4.634500027,0.761,0,,,novy et al 2013,seed mass from cheplick 2005,3
+Microstegium vimineum,Poaceae,sd,"morgantown, west virginia",39.775,-79.9833,NA,1.834284351,-6.596250057,0.761,0,,,novy et al 2013,seed mass from cheplick 2005,3
+Microstegium vimineum,Poaceae,sd,"murraysville, pennsylvania",40.4472,-79.8222,NA,1.296135993,-7.302750111,0.761,0,,,novy et al 2013,seed mass from cheplick 2005,3
+Microstegium vimineum,Poaceae,sd,"flemington, new jersey",40.6222,-74.8944,NA,1.612905229,-7.336500168,0.761,0,,,novy et al 2013,seed mass from cheplick 2005,3
+Microstegium vimineum,Poaceae,sd,"orange, conneticut",41.35,-73.1333,NA,1.76485617,-7.62225008,0.761,0,,,novy et al 2013,seed mass from cheplick 2005,3
+Ambrosia artemisiifolia,Asteraceae,sd,"Drebkau, Germany",51.69166667,14.32222222,2011,1.382227332,-2.587999821,3.63,0,,,scalone et al 2016,,2
+Ambrosia artemisiifolia,Asteraceae,sd,"Martonvasar and Barcska, Hungary",47.43611111,18.91944444,2011,0.72659168,-2.846999884,3.63,0,,,scalone et al 2016,,3
+Ambrosia artemisiifolia,Asteraceae,sd,"Kaposvar, Hungary",46.4,17.89722222,2011,1.21540681,-2.964750051,3.63,0,,,scalone et al 2016,,3
+Ambrosia artemisiifolia,Asteraceae,sd,"Pluvet, France",47.23333333,5.252777778,2011,0.939736386,-0.480250001,3.63,0,,,scalone et al 2016,,3
+Ambrosia artemisiifolia,Asteraceae,sd,"Besate, Italy",45.36944444,9.025,2011,0.690156045,-1.796999931,3.63,0,,,scalone et al 2016,,3
+Ambrosia artemisiifolia,Asteraceae,sd,"St Clothilde, Canada",45.175,73.80555556,2011,0.211375882,-16.61000061,3.63,0,,,scalone et al 2016,,3
+Ambrosia artemisiifolia,Asteraceae,sd,"Bassens, France",44.91111111,0.677777778,2010,1.263220045,2.345999956,3.63,0,,,scalone et al 2016,,3
+Ambrosia artemisiifolia,Asteraceae,sd,"Pribinic, Bosnia & Herzegovina",44.74722222,17.92777778,2011,1.858028803,-4.06524992,3.63,0,,,scalone et al 2016,,3
+Ambrosia artemisiifolia,Asteraceae,sd,"Dions, France",43.94166667,4.361111111,2010,0.976704944,2.198250055,3.63,0,,,scalone et al 2016,,3
+Ambrosia artemisiifolia,Asteraceae,sd,"Lexington, USA",38.01666667,84.57777778,2010,0.157247036,-15.67150021,3.63,0,,,scalone et al 2016,,3
+Plantago lanceolata,Plantaginaceae,ld,"Cornell University, Ithaca, New York",42.4511,-76.4747,1946,1.125141072,-10.06099987,1.3,0,,,snyder 1948,,1
+Solidago shortii,Asteraceae,sd,"The 13 populations of S. shortii occur be- tween 38?24'27"" and 38?26'42""N latitudes, and between 83?58'35"" and 84?00'42""W longitudes. The area bounded by these co- ordinates is approximately 12.2 km2. The populations occur within an elevation range of 201 to 268 m above mean sea level",38.51111111,84.08888889,NA,0.147452983,-16.70375061,NA,0,,,walck et al 1999,"Population information obtained from referenced Buchele, David E., Jerry M. Baskin, and Carol C. Baskin. ""Ecology of the Endangered Species Solidago Shortii. I. Geography, Populations, and Physical Habitat."" Bulletin of the Torrey Botanical Club 116, no. 4 (1989): 344-55. Accessed June 1, 2021. doi:10.2307/2996624.",1
+Silene latifolia,Carophyllaceae,sd,"Seeds of
+S. latifolia for this experiment were collected from a
+naturally occurring population along the edge of a
+mixed boreal-hardwood forest at the University of
+Michigan Biological Station at Pellston, MI, USA.",45.5572,-84.6777,NA,1.47403699,-12.65575027,0.81,0,,,wang 2007,,1
+Hibiscus engleri,Malvaceae,sd,"PI 364901, Rocky
+hillside, Mnondozi Dam, Kruger National Park.",-25.0347,31.9343,NA,0.41792835,8.549500465,3.8948,0,,,warner and erwin 2001,,1
+Persicaria lapathifolia,Polygonaceae,sd,Gravelly bank of the river Ahr near its mouth,51.9565,4.134,1983,0.276921603,0.905000031,1.49,0,,,Wisskirchen 2006,ahr river leads to rhine so I used the mouth of the rhine river as coordinates,1
+Alopecurus aequalis,Poaceae,ld,Bottom of the drained barrage Agger-Talsperre,51.0347,7.6314,1985,1.296135993,-2.012500048,0.168,0,,,wisskirchin 2006,,1
+Atriplex prostrata,Amaranthaceae,sd,"Euskirchen, settling ponds of the sugar factory",50.6588,6.8068,1986,0.599106048,-1.353500009,4,0,,,wisskirchin 2006,,1
+Bidens cernua,Asteraceae,sd,"Wesseling near Koln, muddy sediments of the pond Entenfang",50.8275,6.9585,1985,0.69908998,-0.378749996,3.33,0,,,wisskirchin 2006,,1
+Bidens tripartita,Asteraceae,sd,"Dunstekoven (west of Bonn), pond margin near Gut Capellen",50.6947,6.9395,1986,1.02826845,-0.378749996,2.3,0,,,wisskirchin 2006,,1
+Chenopodium ficifolium,Amaranthaceae,na,"Wesseling (south of Koln), sandy riverbanks of the Rhine",50.8237,6.9913,1986,0.540527078,-0.378749996,0.369,0,,,wisskirchin 2006,coordinates centred on the sandiest part of the riverbank I could find,1
+Chenopodium glaucum,Amaranthaceae,sd,"Bonn-Beuel, silageplace near the northern bridge",50.7562,7.0946,1986,1.015127819,-0.384000003,0.232,0,,,wisskirchin 2006,,1
+Persicaria lapathifolia ssp. lapathifolia,Polygonaceae,sd,Gravelly bank of the river Ahr near its mouth,51.9565,4.134,1983,0.276921603,0.905000031,NA,0,,hybrids,wisskirchin 2006,,1
+Persicaria lapthifolia ssp. brittingeri,Polygonaceae,sd,Gravelly bank of the river Ahr near its mouth,51.9565,4.134,1984,0.276921603,0.905000031,2.25,0,,k type strain,wisskirchin 2006,,1
+Plantago major ,Plantaginaceae,ld,Lower riverside of the Mosel near Reil,50.0059,7.1178,1985,1.002155117,-1.463500023,0.143,0,,ssp. pallida,wisskirchin 2006,,2
+Ranunculus sceleratus,Ranunculaceae,ld,"Schophoven near Duren, margin of a sewage pond",50.8747,6.4009,1985,0.881205375,-0.025,0.2,0,,,wisskirchin 2006,,1
+Rorippa paulstris,Brassicaceae,ld,Bottem of the drained barrage Aggertalsperre,51.0347,7.6314,1985,1.296135993,-2.012500048,0.082,0,,,wisskirchin 2006,,1
+Rumex palustris,Polygonaceae,ld,"Dormagen, settling ponds of the former sugar factory",51.0891,6.8419,1986,0.64717002,0.51700002,0.808,0,,,wisskirchin 2006,,1
+Amaranthus tuberculatus,Amaranthaceae,sd,"Iowa State University Curtiss Farm near Ames, Iowa",42.01666667,-93.58333333,2010,0.475291058,-13.34449959,0.229,0,,,wu and owen 2014,Amaranthus rudis,1
+Hyptis brevipes,Lamiaceae,sd,"plants were grown from seeds originally collected in the region of Campinas (22°55' S; 47°03' W), State of Sao Paulo, Brazil",-22.91666667,-47.05,NA,0.263035104,10.92949963,0.099,0,,,zaidan et al 1991,,1
+,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,
