@@ -16,17 +16,7 @@ Main Analyses for Jagdish et al. (In Review) - Shining a light on patterns of ph
 This code is a multiple part series, each hypothesis (photoperiod related to each variable) is one part
 
 
-Step 1: Read in data 
-
-```{r}
-LessThan5 <- read.csv("LessThan5.csv") #LessThan5.csv - Species which had <5% germination in all treatments or <5 seeds germinated across all 3 treatments were removed from further analyses
-```
-
-```{r}
-LessThan5LDSD <- read.csv("LessThan5LDSD.csv") # LessThan5LDSD.csv - Species which had <5% germination in all treatments or <5 seeds germinated across all 3 treatments were removed from further analyses, where species were weighted as being short-day sensitive, long-day sensitive, based off raw germination results. Species which were neither long-day sensitive, nor short-day sensitive, were half-weighted as short-day, and half-weighted as long-day.
-```
-
-Step 2: Call all relevant libraries
+Step 1: Call all relevant libraries
 ```{r}
 library(lme4)
 library(ggplot2)
@@ -37,6 +27,26 @@ library(emmeans)
 library(rstatix)
 library(ggpubr)
 library(Hmisc)
+library(glmmTMB)
+library(fuzzyjoin)
+```
+
+Step 2: Read in data 
+
+```{r}
+LessThan5 <- read.csv("LessThan5.csv") #LessThan5.csv - Species which had <5% germination in all treatments or <5 seeds germinated across all 3 treatments were removed from further analyses
+```
+
+```{r}
+LessThan5LDSD <- read.csv("LessThan5LDSD.csv") # LessThan5LDSD.csv - Species which had <5% germination in all treatments or <5 seeds germinated across all 3 treatments were removed from further analyses, where species were weighted as being short-day sensitive, long-day sensitive, based off raw germination results. Species which were neither long-day sensitive, nor short-day sensitive, were half-weighted as short-day, and half-weighted as long-day.
+```
+
+```{r}
+RawBinaryGermData <- read.csv("RawBinaryGermData.csv") %>% #also reading in raw data because we will run supplementary analysis with bayesian models of the germination data
+  filter(!Species == "Cissus hypoglauca.B" & !Species == "Cissus hypoglauca.M" & !Species == "Syzygium oleosum.B" & !Species == "Linospadix monostachya.D")
+
+RawGerminationData <- stringdist_left_join(RawBinaryGermData, LessThan5, by = "Species", max_dist = 2) %>%
+  filter(!is.na(Species.y))
 ```
 
 Step 3: Distribution of the data
@@ -97,6 +107,15 @@ nagelkerke(latitudemodel)
 nagelkerke(latitudemodelLDSD)
 ```
 
+#model as a bayesian metric with raw data for supplement
+```{r}
+glmlatitudefit <- glmmTMB(No.Germinated ~ scale(Latitude)+Treatment+scale(Latitude):Treatment + (1+Treatment|Species.x), data = RawGerminationData, family = "binomial")
+summary(glmlatitudefit)
+#test for singularity 
+ranef(glmlatitudefit) #shows very low values - 
+```
+
+
 
 PART 2:
 
@@ -149,6 +168,14 @@ nagelkerke (seedmassmodel, seedmassmodel_null)
 nagelkerke (seedmassmodelLDSD)
 ```
 
+
+#model as a bayesian metric with raw data for supplement
+```{r}
+glmseedmassfit <- glmmTMB(No.Germinated ~ scale(Seed.Mass.Mg)+Treatment+scale(Seed.Mass.Mg):Treatment + (1+Treatment|Species.x), data = RawGerminationData, family = "binomial")
+summary(glmlatitudefit)
+```
+
+
 PART 3:
 
 #PHOTOPERIOD SENSITIVITY AND LEAF AREA INDEX (LAI)
@@ -200,6 +227,12 @@ nagelkerke (LAImodel, LAImodel_null)
 nagelkerke (laimodelLDSD)
 ```
 
+#model as a bayesian metric with raw data for supplement
+```{r}
+glmLAIfit <- glmmTMB(No.Germinated ~ scale(LAI)+Treatment+scale(LAI):Treatment + (1+Treatment|Species.x), data = RawGerminationData, family = "binomial")
+summary(glmLAIfit)
+```
+
 PART 4:
 
 #PHOTOPERIOD SENSITIVITY AND ALPINE VS. NON-ALPINE HABITATS
@@ -245,6 +278,12 @@ nagelkerke(alpmodel)
 #Nagelkerke Pseudo R^2 Value for LD/SD model:
 ```{r}
 nagelkerke(alpmodelLDSD)
+```
+
+#model as a bayesian metric with raw data for supplement
+```{r}
+glmalpinefit <- glmmTMB(No.Germinated ~ Alpine.Habitat+Treatment+Alpine.Habitat:Treatment + (1+Treatment|Species.x), data = RawGerminationData, family = "binomial")
+summary(glmalpinefit)
 ```
 
 PART 5:
@@ -315,5 +354,10 @@ nagelkerke(gfmodel)
 nagelkerke(gfmodelLDSD)
 ```
 
+#model as a bayesian metric with raw data for supplement
+```{r}
+glmgrowthformfit <- glmmTMB(No.Germinated ~ Growth.Form+Treatment+Growth.Form:Treatment + (1+Treatment|Species.x), data = RawGerminationData, family = "binomial")
+summary(glmgrowthformfit)
+```
 *END OF SCRIPT*
 
