@@ -42,11 +42,12 @@ LessThan5LDSD <- read.csv("LessThan5LDSD.csv") # LessThan5LDSD.csv - Species whi
 ```
 
 ```{r}
-RawBinaryGermData <- read.csv("RawBinaryGermData.csv") %>% #also reading in raw data because we will run supplementary analysis with bayesian models of the germination data
-  filter(!Species == "Cissus hypoglauca.B" & !Species == "Cissus hypoglauca.M" & !Species == "Syzygium oleosum.B" & !Species == "Linospadix monostachya.D")
+RawBinaryGermData <- read.csv("RawBinaryGermData.csv")#also reading in raw data because we will run supplementary analysis with bayesian models of the germination data
 
-RawGerminationData <- stringdist_left_join(RawBinaryGermData, LessThan5, by = "Species", max_dist = 2) %>%
-  filter(!is.na(Species.y))
+RawGerminationData <- RawBinaryGermData %>%
+  filter(!Species == "Cissus hypoglauca.B" & !Species == "Cissus hypoglauca.M" & !Species == "Syzygium oleosum.B" & !Species == "Linospadix monostachya.D") %>%
+  stringdist_left_join(., LessThan5, by = "Species", max_dist = 2) %>%
+  filter(!is.na(Species.y)) #creating a data frame in all these lines that ONLY has species that we run the main analyses for
 ```
 
 Step 3: Distribution of the data
