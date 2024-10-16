@@ -232,6 +232,12 @@ nagelkerke (laimodelLDSD)
 ```{r}
 glmLAIfit <- glmmTMB(No.Germinated ~ scale(LAI)+Treatment+scale(LAI):Treatment + (1+Treatment|Species.x), data = RawGerminationData, family = "binomial")
 summary(glmLAIfit)
+
+slope = sqrt((fixef(glmLAIfit)[[1]]["scale(LAI):TreatmentLong"]^2 + fixef(glmLAIfit)[[1]]["scale(LAI):TreatmentShort"]^2 + (fixef(glmLAIfit)[[1]]["scale(LAI):TreatmentLong"] - fixef(glmLAIfit)[[1]]["scale(LAI):TreatmentLong"])^2 )/3)
+
+slope
+
+emmeans(glmLAIfit, pairwise ~ LAI * Treatment)
 ```
 
 PART 4:
