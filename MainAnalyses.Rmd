@@ -29,6 +29,7 @@ library(ggpubr)
 library(Hmisc)
 library(glmmTMB)
 library(fuzzyjoin)
+library(parameters)
 ```
 
 Step 2: Read in data 
@@ -110,10 +111,29 @@ nagelkerke(latitudemodelLDSD)
 
 #model as a bayesian metric with raw data for supplement
 ```{r}
+#run model
 glmlatitudefit <- glmmTMB(No.Germinated ~ scale(Latitude)+Treatment+scale(Latitude):Treatment + (1+Treatment|Species.x), data = RawGerminationData, family = "binomial")
 summary(glmlatitudefit)
+
 #test for singularity 
-ranef(glmlatitudefit) #shows very low values - 
+ranef(glmlatitudefit) #no very low values - no singularity
+
+#calculate slope
+slopelatitude = sqrt((fixef(glmlatitudefit)[[1]]["scale(Latitude):TreatmentLong"]^2 + fixef(glmlatitudefit)[[1]]["scale(Latitude):TreatmentShort"]^2 + (fixef(glmlatitudefit)[[1]]["scale(Latitude):TreatmentLong"] - fixef(glmlatitudefit)[[1]]["scale(Latitude):TreatmentLong"])^2 )/3)
+
+slopelatitude # 0.074
+
+# calculate standard error of the slope
+
+simulatelatitude = simulate_model(glmlatitudefit, iterations = 100, verbose = TRUE)
+
+
+slope_reps_latitude = sqrt((simulatelatitude[,"scale(Latitude):TreatmentLong"]^2 + simulatelatitude[,"scale(Latitude):TreatmentShort"]^2 + (simulatelatitude["scale(Latitude):TreatmentLong"] - simulatelatitude[,"scale(Latitude):TreatmentLong"])^2) /3)
+
+#summarise slope and SE for appendix
+summary_one_step_latitude = c(slopelatitude, SE_slope = sd(slope_reps_latitude[,1]))
+
+summary_one_step_latitude
 ```
 
 
@@ -172,8 +192,28 @@ nagelkerke (seedmassmodelLDSD)
 
 #model as a bayesian metric with raw data for supplement
 ```{r}
+#run model
 glmseedmassfit <- glmmTMB(No.Germinated ~ scale(Seed.Mass.Mg)+Treatment+scale(Seed.Mass.Mg):Treatment + (1+Treatment|Species.x), data = RawGerminationData, family = "binomial")
-summary(glmlatitudefit)
+summary(glmseedmassfit)
+
+#test for singularity 
+ranef(glmseedmassfit) #not too many very low values - no singularity
+
+#calculate slope
+slopeseedmass = sqrt((fixef(glmseedmassfit)[[1]]["scale(Seed.Mass.Mg):TreatmentLong"]^2 + fixef(glmseedmassfit)[[1]]["scale(Seed.Mass.Mg):TreatmentShort"]^2 + (fixef(glmseedmassfit)[[1]]["scale(Seed.Mass.Mg):TreatmentLong"] - fixef(glmseedmassfit)[[1]]["scale(Seed.Mass.Mg):TreatmentLong"])^2 )/3)
+
+slopeseedmass # 0.091
+
+# calculate standard error of the slope
+
+simulateseedmass = simulate_model(glmseedmassfit, iterations = 100, verbose = TRUE)
+
+slope_reps_seedmass = sqrt((simulateseedmass[,"scale(Seed.Mass.Mg):TreatmentLong"]^2 + simulateseedmass[,"scale(Seed.Mass.Mg):TreatmentShort"]^2 + (simulateseedmass["scale(Seed.Mass.Mg):TreatmentLong"] - simulateseedmass[,"scale(Seed.Mass.Mg):TreatmentLong"])^2) /3)
+
+#summarise slope and SE for appendix
+summary_one_step_seedmass = c(slopeseedmass, SE_slope = sd(slope_reps_seedmass[,1]))
+
+summary_one_step_seedmass
 ```
 
 
@@ -230,14 +270,28 @@ nagelkerke (laimodelLDSD)
 
 #model as a bayesian metric with raw data for supplement
 ```{r}
+#run model
 glmLAIfit <- glmmTMB(No.Germinated ~ scale(LAI)+Treatment+scale(LAI):Treatment + (1+Treatment|Species.x), data = RawGerminationData, family = "binomial")
 summary(glmLAIfit)
 
-slope = sqrt((fixef(glmLAIfit)[[1]]["scale(LAI):TreatmentLong"]^2 + fixef(glmLAIfit)[[1]]["scale(LAI):TreatmentShort"]^2 + (fixef(glmLAIfit)[[1]]["scale(LAI):TreatmentLong"] - fixef(glmLAIfit)[[1]]["scale(LAI):TreatmentLong"])^2 )/3)
+#test for singularity 
+ranef(glmLAIfit) #not low values - no singularity
 
-slope
+#calculate slope
+slopeLAI = sqrt((fixef(glmLAIfit)[[1]]["scale(LAI):TreatmentLong"]^2 + fixef(glmLAIfit)[[1]]["scale(LAI):TreatmentShort"]^2 + (fixef(glmLAIfit)[[1]]["scale(LAI):TreatmentLong"] - fixef(glmLAIfit)[[1]]["scale(LAI):TreatmentLong"])^2 )/3)
 
-emmeans(glmLAIfit, pairwise ~ LAI * Treatment)
+slopeLAI # 0.239
+
+# calculate standard error of the slope
+
+simulateLAI = simulate_model(glmLAIfit, iterations = 100, verbose = TRUE)
+
+slope_reps_LAI = sqrt((simulateLAI[,"scale(LAI):TreatmentLong"]^2 + simulateLAI[,"scale(LAI):TreatmentShort"]^2 + (simulateLAI["scale(LAI):TreatmentLong"] - simulateLAI[,"scale(LAI):TreatmentLong"])^2) /3)
+
+#summarise slope and SE for appendix
+summary_one_step_LAI = c(slopeLAI, SE_slope = sd(slope_reps_LAI[,1]))
+
+summary_one_step_LAI
 ```
 
 PART 4:
@@ -288,9 +342,65 @@ nagelkerke(alpmodelLDSD)
 ```
 
 #model as a bayesian metric with raw data for supplement
-```{r}
+````{r}
+#because alpine vs. non-alpine growth forms are a factor predictor variable - the code is slightly different to the continuous predictor variables previously (latitiude, seed mass, LAI)
+#run model
 glmalpinefit <- glmmTMB(No.Germinated ~ Alpine.Habitat+Treatment+Alpine.Habitat:Treatment + (1+Treatment|Species.x), data = RawGerminationData, family = "binomial")
 summary(glmalpinefit)
+
+#test for singularity 
+ranef(glmalpinefit) #not low values - no singularity
+
+#Extract the coefficient data (this has added in the random effects)
+coef_alpine = coef(glmalpinefit)[[1]]$Species %>% 
+  mutate(Species.x = rownames(.)) #adding a column for species
+
+# for each level of the factor variable (2 levels - alpine or non-alpine), calculate the PPS separately
+
+#Level 1 is the reference level (Alpine)
+coef_data_nonalpine = 
+  coef_alpine %>% 
+  left_join(RawGerminationData [, c("Alpine.Habitat","Species.x")]) %>%
+  subset(Alpine.Habitat == "Alpine") %>%
+  mutate(Treat2_effect_per_species = `TreatmentLong`) %>%
+  mutate(Treat3_effect_per_species = `TreatmentShort`) %>% 
+  mutate(PPS = sqrt((Treat2_effect_per_species^2 +Treat3_effect_per_species^2 +(Treat2_effect_per_species-Treat3_effect_per_species)^2)/3))
+
+
+#Level 2 
+coef_data_alpine = 
+  coef_alpine %>% 
+  left_join(RawGerminationData [, c("Alpine.Habitat","Species.x")]) %>%
+  subset(Alpine.Habitat == "Non-Alpine") %>%
+  mutate(Treat2_effect_per_species = `Alpine.HabitatNon-Alpine:TreatmentLong` + `TreatmentLong`) %>%
+  mutate(Treat3_effect_per_species = `Alpine.HabitatNon-Alpine:TreatmentShort` + `TreatmentLong`) %>% 
+  mutate(PPS = sqrt((Treat2_effect_per_species^2 +Treat3_effect_per_species^2 +(Treat2_effect_per_species-Treat3_effect_per_species)^2)/3))
+
+
+PPS_vs_alpine_Data = bind_rows(coef_data_alpine,coef_data_nonalpine)
+
+ggplot(PPS_vs_alpine_Data, aes(Alpine.Habitat, PPS)) + geom_violin()
+
+
+#for a factor there is no slope, only mean differences. 
+#Photo period sensitivity change  difference between Level 2 and 1. 
+slope_level1_2 = sqrt((fixef(glmalpinefit)[[1]]["Alpine.HabitatNon-Alpine:TreatmentLong"]^2 + fixef(glmalpinefit)[[1]]["Alpine.HabitatNon-Alpine:TreatmentShort"]^2 + (fixef(glmalpinefit)[[1]]["Alpine.HabitatNon-Alpine:TreatmentLong"])^2 )/3)
+
+
+names(slope_level1_2 ) = "mean diff (L2-L1)"
+slope_level1_2 
+
+#To calculate the SE of the slope 
+
+simulate_alpine = simulate_model(glmalpinefit, iterations = 100, verbose = TRUE)
+
+
+# SE of mean PPS level 2 - level 1. 
+slope_reps_level1_2 = sqrt((simulate_alpine[,"Alpine.HabitatNon-Alpine:TreatmentLong"]^2 + simulate_alpine[,"Alpine.HabitatNon-Alpine:TreatmentShort"]^2 + (simulate_alpine["Alpine.HabitatNon-Alpine:TreatmentLong"] - simulate_alpine[,"Alpine.HabitatNon-Alpine:TreatmentLong"])^2) /3)
+
+summary_one_step_level1_2 = c(slope_level1_2, SE_slope = sd(slope_reps_level1_2[,1]))
+
+summary_one_step_level1_2
 ```
 
 PART 5:
@@ -362,9 +472,91 @@ nagelkerke(gfmodelLDSD)
 ```
 
 #model as a bayesian metric with raw data for supplement
-```{r}
-glmgrowthformfit <- glmmTMB(No.Germinated ~ Growth.Form+Treatment+Growth.Form:Treatment + (1+Treatment|Species.x), data = RawGerminationData, family = "binomial")
+````{r}
+#because growth forms are a factor predictor variable - the code is slightly different to the continuous predictor variables previously (latitiude, seed mass, LAI)
+
+#for this analysis we also need to first take the climbing plants out - we didn't analyse them in the main analyses above because there are only two species with this growth form
+
+RawGerminationDataGrowthForm <- RawGerminationData %>%
+  filter(!Growth.Form == "Climber")
+
+#run model
+glmgrowthformfit <- glmmTMB(No.Germinated ~ Growth.Form +Treatment+Growth.Form:Treatment + (1+Treatment|Species.x), data = RawGerminationDataGrowthForm, family = "binomial")
 summary(glmgrowthformfit)
+
+#test for singularity 
+ranef(glmgrowthformfit) #not low values - no singularity
+
+#Extract the coefficient data (this has added in the random effects)
+coef_growthform = coef(glmgrowthformfit)[[1]]$Species %>% 
+  mutate(Species.x = rownames(.)) #adding a column for species
+
+# for each level of the factor variable (3 levels - herb, shrub, tree), calculate the PPS separately
+
+#Level 1 is the reference level (Herb)
+coef_data_herb = 
+  coef_growthform %>% 
+  left_join(RawGerminationDataGrowthForm [, c("Growth.Form","Species.x")]) %>%
+  subset(Growth.Form == "Herb") %>%
+  mutate(Treat2_effect_per_species = `TreatmentLong`) %>%
+  mutate(Treat3_effect_per_species = `TreatmentShort`) %>% 
+  mutate(PPS = sqrt((Treat2_effect_per_species^2 +Treat3_effect_per_species^2 +(Treat2_effect_per_species-Treat3_effect_per_species)^2)/3))
+
+
+#Level 2(Shrub)
+coef_data_shrub = 
+  coef_growthform %>% 
+  left_join(RawGerminationDataGrowthForm [, c("Growth.Form","Species.x")]) %>%
+  subset(Growth.Form == "Shrub") %>%
+  mutate(Treat2_effect_per_species = `TreatmentLong`) %>%
+  mutate(Treat3_effect_per_species = `TreatmentShort`) %>% 
+  mutate(PPS = sqrt((Treat2_effect_per_species^2 +Treat3_effect_per_species^2 +(Treat2_effect_per_species-Treat3_effect_per_species)^2)/3))
+
+#Level 3 (Tree)
+coef_data_tree = 
+  coef_growthform %>% 
+  left_join(RawGerminationDataGrowthForm [, c("Growth.Form","Species.x")]) %>%
+  subset(Growth.Form == "Tree") %>%
+  mutate(Treat2_effect_per_species = `TreatmentLong`) %>%
+  mutate(Treat3_effect_per_species = `TreatmentShort`) %>% 
+  mutate(PPS = sqrt((Treat2_effect_per_species^2 +Treat3_effect_per_species^2 +(Treat2_effect_per_species-Treat3_effect_per_species)^2)/3))
+
+
+PPS_vs_growthform_Data = bind_rows(coef_data_herb,coef_data_shrub,coef_data_tree)
+
+ggplot(PPS_vs_growthform_Data, aes(Growth.Form, PPS)) + geom_violin()
+
+
+#for a factor there is no slope, only mean differences. 
+#Photo period sensitivity change  difference between Level 2 and 1. 
+slope_level1_2 = sqrt((fixef(glmgrowthformfit)[[1]]["Growth.FormShrub:TreatmentLong"]^2 + fixef(glmgrowthformfit)[[1]]["Growth.FormShrub:TreatmentShort"]^2 + (fixef(glmgrowthformfit)[[1]]["Growth.FormShrub:TreatmentLong"] - fixef(glmgrowthformfit)[[1]]["Growth.FormShrub:TreatmentLong"])^2 )/3)
+
+slope_level1_2
+
+#Photo period sensitivity change  difference between Level 3 and 1. 
+slope_level1_3 = sqrt((fixef(glmgrowthformfit)[[1]]["Growth.FormTree:TreatmentLong"]^2 + fixef(glmgrowthformfit)[[1]]["Growth.FormTree:TreatmentShort"]^2 + (fixef(glmgrowthformfit)[[1]]["Growth.FormTree:TreatmentLong"] - fixef(glmgrowthformfit)[[1]]["Growth.FormTree:TreatmentLong"])^2 )/3)
+
+slope_level1_3
+
+
+#To calculate the SE of the slope 
+
+simulate_growthform = simulate_model(glmgrowthformfit, iterations = 100, verbose = TRUE)
+
+
+# SE of mean PPS level 2 - level 1. 
+slope_reps_level1_2 = sqrt((simulate_growthform[,"Growth.FormShrub:TreatmentLong"]^2 + simulate_growthform[,"Growth.FormShrub:TreatmentLong"]^2 + (simulate_growthform["Growth.FormShrub:TreatmentShort"] - simulate_growthform[,"Growth.FormShrub:TreatmentLong"])^2) /3)
+
+summary_one_step_level1_2 = c(slope_level1_2, SE_slope = sd(slope_reps_level1_2[,1]))
+
+summary_one_step_level1_2
+
+# SE of mean PPS level 3 - level 1. 
+slope_reps_level1_3 = sqrt((simulate_growthform[,"Growth.FormTree:TreatmentLong"]^2 + simulate_growthform[,"Growth.FormTree:TreatmentLong"]^2 + (simulate_growthform["Growth.FormTree:TreatmentShort"] - simulate_growthform[,"Growth.FormTree:TreatmentLong"])^2) /3)
+
+summary_one_step_level1_3 = c(slope_level1_3, SE_slope = sd(slope_reps_level1_3[,1]))
+
+summary_one_step_level1_3
 ```
 *END OF SCRIPT*
 
