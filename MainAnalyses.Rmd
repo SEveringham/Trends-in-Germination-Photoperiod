@@ -72,6 +72,7 @@ A) I) The 'Original' model (prior to classifying species as long-day sensitive, 
 latitudemodel <- glm(PP.Sensitivity~Latitude, family = Gamma(link = "identity"), data =LessThan5, weights = 1/(SE^2))
 
 summary(latitudemodel)
+coef(latitudemodel)
 plot(latitudemodel)
 ```
 
@@ -147,6 +148,7 @@ A) I) The 'Original' seed mass model:
 seedmassmodel <- glm(PP.Sensitivity~Seed.Mass.Mg, family = Gamma(link = "identity"), start = c(0.5, 0.5), data = LessThan5, weights = 1/(SE^2))
 
 summary(seedmassmodel)
+coef(seedmassmodel)
 plot(seedmassmodel)
 ```
 
@@ -226,6 +228,7 @@ A) I) The 'Original' model:
 LAImodel <- glm(PP.Sensitivity~LAI, family = Gamma(link = "identity"), start = c(0.5, 0.5), data =LessThan5, weights = 1/(SE^2))
 
 summary(LAImodel)
+coef(LAImodel)
 plot(LAImodel)
 ```
 
@@ -303,6 +306,7 @@ A) I) The 'Original' model:
 alpmodel <- glm(PP.Sensitivity~Alpine.Habitat, family = Gamma(link = "identity"), data =LessThan5, weights = 1/(SE^2))
 
 summary(alpmodel)
+coef(alpmodel)
 plot(alpmodel)
 ```
 
@@ -429,6 +433,7 @@ LessThan5GF$Growth.Form <- as.factor(LessThan5GF$Growth.Form)
 gfmodel <- glm(PP.Sensitivity~Growth.Form, family = Gamma(link = "identity"), data =LessThan5GF, weights = 1/(SE^2))
 
 summary(gfmodel) #gives between group results
+coef(gfmodel)
 drop1(gfmodel, test = "F") #result of growth form overall
 ```
 
